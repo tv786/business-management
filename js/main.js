@@ -6,7 +6,7 @@ import { ProjectManager } from './projects.js';
 import { AnalyticsManager } from './analytics.js';
 import { CalculatorManager } from './calculators.js';
 import { SettingsManager } from './settings.js';
-import { showToast, showLoading, hideLoading, setupQuickActions, hapticFeedback } from './utils.js';
+import { showToast, showLoading, hideLoading } from './utils.js';
 
 class App {
     constructor() {
@@ -32,9 +32,6 @@ class App {
         // Apply saved settings
         this.applyInitialSettings();
         
-        // Setup quick actions and mobile features
-        setupQuickActions();
-        
         // Show welcome message
         setTimeout(() => {
             const settings = this.settings.loadSettings();
@@ -52,7 +49,6 @@ class App {
         navButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const section = e.currentTarget.dataset.section;
-                hapticFeedback('light'); // Add haptic feedback for mobile
                 this.loadSection(section);
             });
         });
