@@ -187,12 +187,8 @@ export class VendorManager {
         
         document.getElementById('vendor-modal-title').textContent = title;
         
-        // Update category options first
-        this.updateCategoryOptions();
-        
         // Reset form
         document.getElementById('vendor-form').reset();
-        document.getElementById('custom-category-input').style.display = 'none';
         
         // Populate form if editing
         if (vendor) {
