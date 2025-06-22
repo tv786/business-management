@@ -390,7 +390,7 @@
 }
 
 /* High Contrast Mode */
-@media (prefers-contrast: high) {
+/* @media (prefers-contrast: high) {
     :root {
         --primary-color: #000000;
         --primary-dark: #000000;
@@ -412,10 +412,10 @@
     .status-badge {
         border: 1px solid;
     }
-}
+} */
 
 /* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
     :root {
         --white: #1F2937;
         --gray-50: #111827;
@@ -452,4 +452,4 @@
         border-color: var(--gray-300);
         color: var(--gray-800);
     }
-}
+} */
