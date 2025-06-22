@@ -508,7 +508,6 @@ export class SettingsManager {
         }
     }
 
-    // Contact picker functionality
     // In settings.js, update the pickContact method
     async pickContact(inputId) {
         if (!this.loadSettings().contactsAccess) {
