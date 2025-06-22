@@ -201,9 +201,9 @@ self.addEventListener('push', event => {
     console.log('Push notification received:', event);
     
     const options = {
-        body: event.data ? event.data.text() : 'New notification from Business Management',
-        icon: '/assets/logo.svg',
-        badge: '/assets/logo.svg',
+        body: event.data ? event.data.text() : 'New notification from Rul Al-Bina',
+        icon: 'assets/rab-01.png',
+        badge: 'assets/rab-01.png',
         vibrate: [200, 100, 200],
         data: {
             url: '/'
