@@ -510,37 +510,37 @@ export class SettingsManager {
 
     // Contact picker functionality
     // In settings.js, update the pickContact method
-async pickContact(inputId) {
-    if (!this.loadSettings().contactsAccess) {
-        showToast('Contact access is disabled. Enable it in settings.', 'warning');
-        return;
-    }
+    async pickContact(inputId) {
+        if (!this.loadSettings().contactsAccess) {
+            showToast('Contact access is disabled. Enable it in settings.', 'warning');
+            return;
+        }
 
-    try {
-        if ('contacts' in navigator && 'ContactsManager' in window) {
-            const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
-            if (contacts && contacts.length > 0) {
-                const contact = contacts[0];
-                const input = document.getElementById(inputId);
-                if (input) {
-                    // Set the phone number in the phone field
-                    input.value = contact.tel && contact.tel.length > 0 ? contact.tel[0] : '';
-                    
-                    // If this is the phone field, also set the contact name in the contact person field
-                    if (inputId === 'vendor-phone' && contact.name) {
-                        const contactNameField = document.getElementById('vendor-contact');
-                        if (contactNameField) {
-                            contactNameField.value = contact.name;
+        try {
+            if ('contacts' in navigator && 'ContactsManager' in window) {
+                const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+                if (contacts && contacts.length > 0) {
+                    const contact = contacts[0];
+                    const input = document.getElementById(inputId);
+                    if (input) {
+                        // Set the phone number in the phone field
+                        input.value = contact.tel && contact.tel.length > 0 ? contact.tel[0] : '';
+                        
+                        // If this is the phone field, also set the contact name in the contact person field
+                        if (inputId === 'vendor-phone' && contact.name) {
+                            const contactNameField = document.getElementById('vendor-contact');
+                            if (contactNameField) {
+                                contactNameField.value = contact.name;
+                            }
                         }
                     }
                 }
+            } else {
+                showToast('Contact picker not supported on this device', 'warning');
             }
-        } else {
-            showToast('Contact picker not supported on this device', 'warning');
+        } catch (error) {
+            console.error('Contact picker error:', error);
+            showToast('Could not access contacts', 'error');
         }
-    } catch (error) {
-        console.error('Contact picker error:', error);
-        showToast('Could not access contacts', 'error');
     }
-}
 }
