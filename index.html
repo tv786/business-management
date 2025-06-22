@@ -562,12 +562,12 @@
                 <form id="vendor-form" class="modal-body">
                     <div class="form-group">
                         <label for="vendor-name">Name *</label>
-                        <input type="text" id="vendor-name" required>
+                        <input type="text" id="vendor-name">
                     </div>
                     
                     <div class="form-group">
                         <label for="vendor-category">Category *</label>
-                        <select id="vendor-category" required>
+                        <select id="vendor-category" >
                             <option value="">Select Category</option>
                             <!-- Construction -->
                             <optgroup label="Construction">
@@ -651,7 +651,7 @@
                         <div class="form-group">
                             <label for="vendor-phone">Phone *</label>
                             <div class="phone-input-group">
-                                <input type="tel" id="vendor-phone" required>
+                                <input type="tel" id="vendor-phone">
                                 <button type="button" class="btn-contact-picker" onclick="window.app.settings.pickContact('vendor-phone', 'vendor-name')" title="Pick from contacts">
                                     <i class="fas fa-address-book"></i>
                                 </button>
