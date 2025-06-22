@@ -509,6 +509,7 @@ export class SettingsManager {
     }
 
     // In settings.js, update the pickContact method
+    // In settings.js, update the pickContact method
     async pickContact(inputId) {
         if (!this.loadSettings().contactsAccess) {
             showToast('Contact access is disabled. Enable it in settings.', 'warning');
@@ -525,11 +526,11 @@ export class SettingsManager {
                         // Set the phone number in the phone field
                         input.value = contact.tel && contact.tel.length > 0 ? contact.tel[0] : '';
                         
-                        // If this is the phone field, also set the contact name in the contact person field
+                        // If this is the phone field, also set the contact name in the name field
                         if (inputId === 'vendor-phone' && contact.name) {
-                            const contactNameField = document.getElementById('vendor-contact');
-                            if (contactNameField) {
-                                contactNameField.value = contact.name;
+                            const nameField = document.getElementById('vendor-name');
+                            if (nameField) {
+                                nameField.value = contact.name;
                             }
                         }
                     }
