@@ -642,16 +642,17 @@
                     </div>
                     
                     <div class="form-row">
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="vendor-contact">Contact Person</label>
                             <input type="text" id="vendor-contact">
-                        </div>
+                        </div> -->
                         
+                        <!-- And simplify the phone input section to: -->
                         <div class="form-group">
-                            <label for="vendor-phone">Phone</label>
+                            <label for="vendor-phone">Phone *</label>
                             <div class="phone-input-group">
-                                <input type="tel" id="vendor-phone">
-                                <button type="button" class="btn-contact-picker" onclick="window.app.settings.pickContact('vendor-phone')" title="Pick from contacts">
+                                <input type="tel" id="vendor-phone" required>
+                                <button type="button" class="btn-contact-picker" onclick="window.app.settings.pickContact('vendor-phone', 'vendor-name')" title="Pick from contacts">
                                     <i class="fas fa-address-book"></i>
                                 </button>
                             </div>

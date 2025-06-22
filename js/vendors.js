@@ -80,7 +80,7 @@ export class VendorManager {
                 <td>
                     <div class="vendor-info">
                         <strong>${vendor.name}</strong>
-                        ${vendor.contact ? `<br><small class="text-muted">${vendor.contact}</small>` : ''}
+                        ${vendor.phone ? `<br><small class="text-muted"><i class="fas fa-phone"></i> ${vendor.phone}</small>` : ''}
                     </div>
                 </td>
                 <td><span class="badge badge-category">${this.getCategoryLabel(vendor.category)}</span></td>
@@ -207,9 +207,8 @@ export class VendorManager {
     saveVendor() {
         const formData = new FormData(document.getElementById('vendor-form'));
         const vendorData = {
-            name: document.getElementById('vendor-name').value.trim(),
+            nname: document.getElementById('vendor-name').value.trim(),
             category: document.getElementById('vendor-category').value,
-            contact: document.getElementById('vendor-contact').value.trim(),
             phone: document.getElementById('vendor-phone').value.trim(),
             email: document.getElementById('vendor-email').value.trim(),
             address: document.getElementById('vendor-address').value.trim(),
