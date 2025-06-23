@@ -566,8 +566,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="vendor-category">Category *</label>
-                        <select id="vendor-category" required>
+                        <label for="vendor-category">Category </label>
+                        <select id="vendor-category">
                             <option value="">Select Category</option>
                             <!-- Construction -->
                             <optgroup label="Construction">
@@ -589,56 +589,17 @@
                                 <option value="architect">Architect</option>
                                 <option value="engineer">Engineer</option>
                                 <option value="subcontractor">Subcontractor</option>
-                            </optgroup>
-                            <!-- Retail & Commerce -->
-                            <optgroup label="Retail & Commerce">
-                                <option value="wholesale">Wholesale Supplier</option>
-                                <option value="manufacturer">Manufacturer</option>
-                                <option value="distributor">Distributor</option>
-                                <option value="packaging">Packaging Supplier</option>
-                                <option value="printing">Printing Services</option>
-                                <option value="marketing">Marketing Agency</option>
-                                <option value="pos-vendor">POS System Vendor</option>
-                            </optgroup>
-                            <!-- Services -->
-                            <optgroup label="Services">
-                                <option value="consulting">Consulting Services</option>
-                                <option value="legal">Legal Services</option>
-                                <option value="accounting">Accounting Services</option>
-                                <option value="cleaning">Cleaning Services</option>
-                                <option value="security">Security Services</option>
-                                <option value="maintenance">Maintenance Services</option>
-                                <option value="it-services">IT Services</option>
-                                <option value="training">Training Services</option>
-                            </optgroup>
-                            <!-- Transportation & Logistics -->
-                            <optgroup label="Transportation & Logistics">
-                                <option value="transport">Transport Services</option>
-                                <option value="logistics">Logistics Provider</option>
-                                <option value="courier">Courier Services</option>
-                                <option value="fuel">Fuel Supplier</option>
-                            </optgroup>
-                            <!-- Utilities & Infrastructure -->
-                            <optgroup label="Utilities">
-                                <option value="electricity">Electricity Provider</option>
-                                <option value="water">Water Supplier</option>
-                                <option value="internet">Internet Provider</option>
-                                <option value="telecom">Telecom Services</option>
-                                <option value="waste">Waste Management</option>
-                            </optgroup>
-                            <!-- Food & Hospitality -->
-                            <optgroup label="Food & Hospitality">
-                                <option value="food-supplier">Food Supplier</option>
-                                <option value="beverage">Beverage Supplier</option>
-                                <option value="catering">Catering Services</option>
-                                <option value="kitchen-equipment">Kitchen Equipment</option>
-                            </optgroup>
-                            <!-- General -->
-                            <option value="insurance">Insurance Provider</option>
-                            <option value="bank">Banking Services</option>
-                            <option value="office-supplies">Office Supplies</option>
+                            </optgroup>                          
                             <option value="other">Other</option>
+                            <optgroup label="Custom Caegories"></optgroup>
                         </select>
+                    </div>
+                    <div class="form-group" id="other-category-group" style="display: none;">
+                        <label for="other-category">Specify Category</label>
+                        <div class="input-with-button">
+                            <input type="text" id="other-category">
+                            <button type="button" class="btn btn-secondary" id="add-category-btn">Add</button>
+                        </div>
                     </div>
                     
                     <div class="form-row">

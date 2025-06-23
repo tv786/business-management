@@ -50,7 +50,73 @@ export class VendorManager {
             e.preventDefault();
             this.saveVendor();
         });
+
+        // Handle category selection change
+        document.getElementById('vendor-category').addEventListener('change', (e) => {
+            const otherCategoryGroup = document.getElementById('other-category-group');
+            otherCategoryGroup.style.display = e.target.value === 'other' ? 'block' : 'none';
+        });
+
+        // Handle add category button
+        document.getElementById('add-category-btn').addEventListener('click', () => {
+            this.addNewCategory();
+        });
     }
+
+    // Add new method to handle adding categories
+    addNewCategory() {
+        const categoryInput = document.getElementById('other-category');
+        const categoryName = categoryInput.value.trim();
+        
+        if (!categoryName) {
+            showToast('Please enter a category name', 'error');
+            return;
+        }
+
+        // Get current settings
+        const settings = window.app.settings.loadSettings();
+        
+        // Initialize custom categories if not exists
+        if (!settings.customCategories) {
+            settings.customCategories = {
+                vendor: [],
+                transaction: [],
+                project: []
+            };
+        }
+        
+        if (!settings.customCategories.vendor) {
+            settings.customCategories.vendor = [];
+        }
+
+        // Check if category already exists
+        if (settings.customCategories.vendor.includes(categoryName)) {
+            showToast('Category already exists', 'warning');
+            return;
+        }
+
+        // Add new category
+        settings.customCategories.vendor.push(categoryName);
+        window.app.settings.storage.saveSettings(settings);
+
+        // Update the select dropdown
+        const categorySelect = document.getElementById('vendor-category');
+        const otherOption = categorySelect.querySelector('option[value="other"]');
+        
+        // Create new option before "Other"
+        const newOption = document.createElement('option');
+        newOption.value = categoryName.toLowerCase().replace(/\s+/g, '-');
+        newOption.textContent = categoryName;
+        categorySelect.insertBefore(newOption, otherOption);
+
+        // Select the new category and hide the input
+        categorySelect.value = newOption.value;
+        document.getElementById('other-category-group').style.display = 'none';
+        categoryInput.value = '';
+
+        showToast('Category added successfully', 'success');
+    }
+
 
     loadVendors() {
         this.renderVendorsTable();
@@ -83,7 +149,12 @@ export class VendorManager {
                         ${vendor.contact ? `<br><small class="text-muted">${vendor.contact}</small>` : ''}
                     </div>
                 </td>
-                <td><span class="badge badge-category">${this.getCategoryLabel(vendor.category)}</span></td>
+                <td>
+                    ${vendor.category ? 
+                        `<span class="badge badge-category">${this.getCategoryLabel(vendor.category)}</span>` : 
+                        '<span class="badge badge-category uncategorized">Uncategorized</span>'
+                    }
+                </td>
                 <td>
                     ${vendor.phone ? `<i class="fas fa-phone"></i> ${vendor.phone}<br>` : ''}
                     ${vendor.email ? `<i class="fas fa-envelope"></i> ${vendor.email}` : ''}
@@ -205,10 +276,19 @@ export class VendorManager {
     }
 
     saveVendor() {
-        const formData = new FormData(document.getElementById('vendor-form'));
-        const vendorData = {
+         const formData = new FormData(document.getElementById('vendor-form'));
+        const categorySelect = document.getElementById('vendor-category');
+        const selectedCategory = categorySelect.value;
+
+        // If "other" was selected but no new category was added
+        if (selectedCategory === 'other') {
+            showToast('Please add a new category or select an existing one', 'error');
+            return;
+        }
+
+         const vendorData = {
             name: document.getElementById('vendor-name').value.trim(),
-            category: document.getElementById('vendor-category').value,
+            category: selectedCategory,
             contact: document.getElementById('vendor-contact').value.trim(),
             phone: document.getElementById('vendor-phone').value.trim(),
             email: document.getElementById('vendor-email').value.trim(),
@@ -217,9 +297,11 @@ export class VendorManager {
             status: 'active'
         };
 
-        // Validate required fields
-        if (!vendorData.name || !vendorData.category) {
-            showToast('Please fill in all required fields', 'error');
+        
+
+        // Validate required fields - now only name is required
+        if (!vendorData.name) {
+            showToast('Vendor name is required', 'error');
             return;
         }
 
@@ -366,6 +448,7 @@ export class VendorManager {
     }
 
     getCategoryLabel(category) {
+        if (!category) return 'Uncategorized'; // Handle empty category
         const categories = {
             // Construction
             'materials': 'Materials Supplier',

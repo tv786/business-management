@@ -139,7 +139,12 @@ select#dashboard-period {
     background: var(--gray-100);
     color: var(--gray-700);
 }
-
+.badge-category.uncategorized {
+    background-color: #e5e7eb;
+    color: #6b7280;
+    padding: 5px;
+    border-radius: 5px;
+}
 .payment-method {
     display: inline-block;
     padding: 3px 8px;

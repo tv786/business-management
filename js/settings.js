@@ -368,7 +368,11 @@ export class SettingsManager {
             currency: document.getElementById('currency-select').value,
             dateFormat: document.getElementById('date-format').value,
             contactsAccess: document.getElementById('contacts-access').checked,
-            customCategories: this.loadSettings().customCategories,
+            customCategories: this.loadSettings().customCategories || {
+                vendor: [],
+                transaction: [],
+                project: []
+            },
             theme: 'light' // Always light theme
         };
 
