@@ -614,7 +614,7 @@ select#dashboard-period {
 .project-actions {
     display: flex;
     gap: var(--spacing-sm);
-    margin-top: 20px;
+    margin-top: 20px !important;
 }
 
 /* Calculators */
