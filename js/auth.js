@@ -57,6 +57,117 @@ export class AuthManager {
                 this.handleSignup();
             });
         }
+
+        // Add real-time form validation
+        this.setupFormValidation();
+    }
+
+    setupFormValidation() {
+        // Login form validation
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        
+        if (loginEmail) {
+            loginEmail.addEventListener('blur', () => this.validateEmail(loginEmail));
+            loginEmail.addEventListener('input', () => this.clearError(loginEmail));
+        }
+        
+        if (loginPassword) {
+            loginPassword.addEventListener('blur', () => this.validateRequired(loginPassword));
+            loginPassword.addEventListener('input', () => this.clearError(loginPassword));
+        }
+
+        // Signup form validation
+        const signupName = document.getElementById('signup-name');
+        const signupEmail = document.getElementById('signup-email');
+        const signupPassword = document.getElementById('signup-password');
+        const signupConfirmPassword = document.getElementById('signup-confirm-password');
+        
+        if (signupName) {
+            signupName.addEventListener('blur', () => this.validateRequired(signupName));
+            signupName.addEventListener('input', () => this.clearError(signupName));
+        }
+        
+        if (signupEmail) {
+            signupEmail.addEventListener('blur', () => this.validateEmail(signupEmail));
+            signupEmail.addEventListener('input', () => this.clearError(signupEmail));
+        }
+        
+        if (signupPassword) {
+            signupPassword.addEventListener('input', () => {
+                this.checkPasswordStrength(signupPassword);
+                this.clearError(signupPassword);
+            });
+            signupPassword.addEventListener('blur', () => this.validatePassword(signupPassword));
+        }
+        
+        if (signupConfirmPassword) {
+            signupConfirmPassword.addEventListener('blur', () => this.validatePasswordMatch(signupPassword, signupConfirmPassword));
+            signupConfirmPassword.addEventListener('input', () => this.clearError(signupConfirmPassword));
+        }
+    }
+
+    validateEmail(input) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValid = emailRegex.test(input.value);
+        this.setFieldValidation(input, isValid);
+        return isValid;
+    }
+
+    validateRequired(input) {
+        const isValid = input.value.trim().length > 0;
+        this.setFieldValidation(input, isValid);
+        return isValid;
+    }
+
+    validatePassword(input) {
+        const isValid = input.value.length >= 6;
+        this.setFieldValidation(input, isValid);
+        return isValid;
+    }
+
+    validatePasswordMatch(passwordInput, confirmInput) {
+        const isValid = passwordInput.value === confirmInput.value && confirmInput.value.length > 0;
+        this.setFieldValidation(confirmInput, isValid);
+        return isValid;
+    }
+
+    setFieldValidation(input, isValid) {
+        const formGroup = input.closest('.form-group');
+        if (isValid) {
+            formGroup.classList.remove('error');
+            formGroup.classList.add('success');
+        } else {
+            formGroup.classList.remove('success');
+            formGroup.classList.add('error');
+        }
+    }
+
+    clearError(input) {
+        const formGroup = input.closest('.form-group');
+        formGroup.classList.remove('error', 'success');
+    }
+
+    checkPasswordStrength(passwordInput) {
+        const password = passwordInput.value;
+        const strengthBar = passwordInput.parentElement.querySelector('.strength-bar');
+        
+        if (!strengthBar) return;
+
+        let strength = 0;
+        if (password.length >= 6) strength += 1;
+        if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+        if (password.match(/[0-9]/)) strength += 1;
+        if (password.match(/[^A-Za-z0-9]/)) strength += 1;
+
+        strengthBar.className = 'strength-bar';
+        if (strength === 1) {
+            strengthBar.classList.add('weak');
+        } else if (strength === 2 || strength === 3) {
+            strengthBar.classList.add('medium');
+        } else if (strength === 4) {
+            strengthBar.classList.add('strong');
+        }
     }
 
     showLoginModal() {
@@ -85,100 +196,172 @@ export class AuthManager {
     }
 
     async handleLogin() {
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
+        const emailInput = document.getElementById('login-email');
+        const passwordInput = document.getElementById('login-password');
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
 
-        if (!email || !password) {
-            showToast('Please fill in all fields', 'error');
+        // Clear previous errors
+        this.clearError(emailInput);
+        this.clearError(passwordInput);
+
+        // Validate form
+        let isValid = true;
+        if (!this.validateEmail(emailInput)) {
+            isValid = false;
+        }
+        if (!this.validateRequired(passwordInput)) {
+            isValid = false;
+        }
+
+        if (!isValid) {
+            showToast('Please correct the errors in the form', 'error');
             return;
         }
 
-        // Check if user exists in storage
-        const users = this.getStoredUsers();
-        const user = users.find(u => u.email === email);
+        // Show loading state
+        const submitBtn = document.querySelector('#login-form .btn-primary');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+        submitBtn.disabled = true;
 
-        if (!user) {
-            showToast('User not found. Please sign up first.', 'error');
-            return;
+        // Simulate API delay for better UX
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        try {
+            // Check if user exists in storage
+            const users = this.getStoredUsers();
+            const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+            if (!user) {
+                throw new Error('User not found. Please sign up first.');
+            }
+
+            // Simple password check (in real app, use proper hashing)
+            if (user.password !== password) {
+                throw new Error('Invalid password. Please try again.');
+            }
+
+            // Login successful
+            this.currentUser = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar || this.generateAvatar(user.name)
+            };
+
+            this.isAuthenticated = true;
+            this.saveAuth();
+            this.updateUIState();
+            this.closeAllModals();
+            
+            // Clear form
+            emailInput.value = '';
+            passwordInput.value = '';
+            
+            showToast(`Welcome back, ${this.currentUser.name}!`, 'success');
+        } catch (error) {
+            showToast(error.message, 'error');
+        } finally {
+            // Restore button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
         }
-
-        // Simple password check (in real app, use proper hashing)
-        if (user.password !== password) {
-            showToast('Invalid password', 'error');
-            return;
-        }
-
-        // Login successful
-        this.currentUser = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            avatar: user.avatar || this.generateAvatar(user.name)
-        };
-
-        this.isAuthenticated = true;
-        this.saveAuth();
-        this.updateUIState();
-        this.closeAllModals();
-        
-        showToast(`Welcome back, ${this.currentUser.name}!`, 'success');
     }
 
     async handleSignup() {
-        const name = document.getElementById('signup-name').value;
-        const email = document.getElementById('signup-email').value;
-        const password = document.getElementById('signup-password').value;
-        const confirmPassword = document.getElementById('signup-confirm-password').value;
-
-        if (!name || !email || !password || !confirmPassword) {
-            showToast('Please fill in all fields', 'error');
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            showToast('Passwords do not match', 'error');
-            return;
-        }
-
-        if (password.length < 6) {
-            showToast('Password must be at least 6 characters', 'error');
-            return;
-        }
-
-        // Check if user already exists
-        const users = this.getStoredUsers();
-        if (users.find(u => u.email === email)) {
-            showToast('User already exists. Please login instead.', 'error');
-            return;
-        }
-
-        // Create new user
-        const newUser = {
-            id: this.generateId(),
-            name: name,
-            email: email,
-            password: password, // In real app, hash this
-            avatar: this.generateAvatar(name),
-            createdAt: new Date().toISOString()
-        };
-
-        users.push(newUser);
-        this.saveUsers(users);
-
-        // Auto-login the new user
-        this.currentUser = {
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
-            avatar: newUser.avatar
-        };
-
-        this.isAuthenticated = true;
-        this.saveAuth();
-        this.updateUIState();
-        this.closeAllModals();
+        const nameInput = document.getElementById('signup-name');
+        const emailInput = document.getElementById('signup-email');
+        const passwordInput = document.getElementById('signup-password');
+        const confirmPasswordInput = document.getElementById('signup-confirm-password');
         
-        showToast(`Welcome to the platform, ${this.currentUser.name}!`, 'success');
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        // Clear previous errors
+        this.clearError(nameInput);
+        this.clearError(emailInput);
+        this.clearError(passwordInput);
+        this.clearError(confirmPasswordInput);
+
+        // Validate form
+        let isValid = true;
+        if (!this.validateRequired(nameInput)) {
+            isValid = false;
+        }
+        if (!this.validateEmail(emailInput)) {
+            isValid = false;
+        }
+        if (!this.validatePassword(passwordInput)) {
+            isValid = false;
+        }
+        if (!this.validatePasswordMatch(passwordInput, confirmPasswordInput)) {
+            isValid = false;
+        }
+
+        if (!isValid) {
+            showToast('Please correct the errors in the form', 'error');
+            return;
+        }
+
+        // Show loading state
+        const submitBtn = document.querySelector('#signup-form .btn-primary');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+        submitBtn.disabled = true;
+
+        // Simulate API delay for better UX
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        try {
+            // Check if user already exists
+            const users = this.getStoredUsers();
+            if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+                throw new Error('An account with this email already exists. Please login instead.');
+            }
+
+            // Create new user
+            const newUser = {
+                id: this.generateId(),
+                name: name,
+                email: email,
+                password: password, // In real app, hash this
+                avatar: this.generateAvatar(name),
+                createdAt: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            this.saveUsers(users);
+
+            // Auto-login the new user
+            this.currentUser = {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email,
+                avatar: newUser.avatar
+            };
+
+            this.isAuthenticated = true;
+            this.saveAuth();
+            this.updateUIState();
+            this.closeAllModals();
+            
+            // Clear form
+            nameInput.value = '';
+            emailInput.value = '';
+            passwordInput.value = '';
+            confirmPasswordInput.value = '';
+            
+            showToast(`Welcome to the platform, ${this.currentUser.name}!`, 'success');
+        } catch (error) {
+            showToast(error.message, 'error');
+        } finally {
+            // Restore button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
     }
 
     logout() {

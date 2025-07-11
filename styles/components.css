@@ -1017,66 +1017,245 @@ select#dashboard-period {
     align-items: center;
     gap: var(--spacing-xs);
     padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: var(--white);
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-lg);
     font-size: var(--font-size-sm);
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .btn-login:hover {
-    background: var(--primary-dark);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .user-profile {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
     background: var(--white);
     border: 1px solid var(--gray-200);
     border-radius: var(--border-radius-lg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .user-avatar {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     object-fit: cover;
+    border: 2px solid var(--primary-light);
 }
 
 .user-name {
     font-size: var(--font-size-sm);
-    font-weight: 500;
+    font-weight: 600;
     color: var(--gray-700);
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .btn-logout {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     background: var(--error-light);
     color: var(--error);
     border: none;
     border-radius: var(--border-radius);
     cursor: pointer;
     transition: var(--transition);
+    font-size: var(--font-size-sm);
 }
 
 .btn-logout:hover {
     background: var(--error);
     color: var(--white);
+    transform: scale(1.05);
+}
+
+/* Enhanced Auth Modal Styles */
+#login-modal .modal-content,
+#signup-modal .modal-content {
+    max-width: 420px;
+    background: var(--white);
+    border-radius: var(--border-radius-xl);
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+#login-modal .modal-header,
+#signup-modal .modal-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: var(--white);
+    padding: var(--spacing-lg);
+    text-align: center;
+    position: relative;
+}
+
+#login-modal .modal-header h2,
+#signup-modal .modal-header h2 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+#login-modal .close-btn,
+#signup-modal .close-btn {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: var(--font-size-lg);
+}
+
+#login-modal .close-btn:hover,
+#signup-modal .close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+#login-form,
+#signup-form {
+    padding: var(--spacing-xl);
+}
+
+#login-form .form-group,
+#signup-form .form-group {
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+}
+
+#login-form .form-group label,
+#signup-form .form-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#login-form .form-group input,
+#signup-form .form-group input {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: var(--gray-50);
+    box-sizing: border-box;
+}
+
+#login-form .form-group input:focus,
+#signup-form .form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: var(--white);
+    box-shadow: 0 0 0 4px var(--primary-light);
+    transform: translateY(-2px);
+}
+
+#login-form .form-group input::placeholder,
+#signup-form .form-group input::placeholder {
+    color: var(--gray-400);
+    font-style: italic;
+}
+
+#login-form .modal-actions,
+#signup-form .modal-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xl);
+    padding-top: 0;
+    border-top: none;
+}
+
+#login-form .modal-actions .btn,
+#signup-form .modal-actions .btn {
+    flex: 1;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--border-radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#login-form .modal-actions .btn-primary,
+#signup-form .modal-actions .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: var(--white);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+#login-form .modal-actions .btn-primary:hover,
+#signup-form .modal-actions .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+#login-form .modal-actions .btn-secondary,
+#signup-form .modal-actions .btn-secondary {
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border: 2px solid var(--gray-200);
+}
+
+#login-form .modal-actions .btn-secondary:hover,
+#signup-form .modal-actions .btn-secondary:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    transform: translateY(-2px);
 }
 
 .auth-switch {
     text-align: center;
-    margin-top: var(--spacing-md);
-    padding-top: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--gray-50);
     border-top: 1px solid var(--gray-200);
 }
 
@@ -1089,9 +1268,64 @@ select#dashboard-period {
 .auth-switch a {
     color: var(--primary-color);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
+    transition: var(--transition);
 }
 
 .auth-switch a:hover {
+    color: var(--primary-dark);
     text-decoration: underline;
+}
+
+/* Input validation styles */
+.form-group.error input {
+    border-color: var(--error);
+    background: var(--error-light);
+}
+
+.form-group.success input {
+    border-color: var(--success);
+    background: var(--success-light);
+}
+
+.form-group .error-message {
+    color: var(--error);
+    font-size: var(--font-size-xs);
+    margin-top: var(--spacing-xs);
+    display: none;
+}
+
+.form-group.error .error-message {
+    display: block;
+}
+
+/* Password strength indicator */
+.password-strength {
+    height: 4px;
+    background: var(--gray-200);
+    border-radius: 2px;
+    margin-top: var(--spacing-xs);
+    overflow: hidden;
+}
+
+.password-strength .strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.password-strength .strength-bar.weak {
+    background: var(--error);
+    width: 33%;
+}
+
+.password-strength .strength-bar.medium {
+    background: var(--warning);
+    width: 66%;
+}
+
+.password-strength .strength-bar.strong {
+    background: var(--success);
+    width: 100%;
 }

@@ -664,28 +664,38 @@
         <div id="login-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="login-modal-title">Login</h2>
+                    <i class="fas fa-sign-in-alt" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                    <h2 id="login-modal-title">Welcome Back</h2>
+                    <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Sign in to your account</p>
                     <button class="close-btn" onclick="closeModal()">&times;</button>
                 </div>
                 <form id="login-form">
                     <div class="form-group">
-                        <label for="login-email">Email</label>
-                        <input type="email" id="login-email" required>
+                        <label for="login-email">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <input type="email" id="login-email" placeholder="Enter your email address" required>
+                        <div class="error-message">Please enter a valid email address</div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="login-password">Password</label>
-                        <input type="password" id="login-password" required>
+                        <label for="login-password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                        <div class="error-message">Please enter your password</div>
                     </div>
                     
                     <div class="modal-actions">
                         <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </button>
                     </div>
                 </form>
                 
                 <div class="auth-switch">
-                    <p>Don't have an account? <a href="#" id="switch-to-signup">Sign up</a></p>
+                    <p>New to our platform? <a href="#" id="switch-to-signup">Create an account</a></p>
                 </div>
             </div>
         </div>
@@ -694,38 +704,57 @@
         <div id="signup-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Sign Up</h2>
+                    <i class="fas fa-user-plus" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                    <h2>Create Account</h2>
+                    <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Join our business management platform</p>
                     <button class="close-btn" onclick="closeModal()">&times;</button>
                 </div>
                 <form id="signup-form">
                     <div class="form-group">
-                        <label for="signup-name">Full Name</label>
-                        <input type="text" id="signup-name" required>
+                        <label for="signup-name">
+                            <i class="fas fa-user"></i> Full Name
+                        </label>
+                        <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                        <div class="error-message">Please enter your full name</div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="signup-email">Email</label>
-                        <input type="email" id="signup-email" required>
+                        <label for="signup-email">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <input type="email" id="signup-email" placeholder="Enter your email address" required>
+                        <div class="error-message">Please enter a valid email address</div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="signup-password">Password</label>
-                        <input type="password" id="signup-password" required>
+                        <label for="signup-password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="signup-password" placeholder="Create a strong password" required>
+                        <div class="password-strength">
+                            <div class="strength-bar"></div>
+                        </div>
+                        <div class="error-message">Password must be at least 6 characters</div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="signup-confirm-password">Confirm Password</label>
-                        <input type="password" id="signup-confirm-password" required>
+                        <label for="signup-confirm-password">
+                            <i class="fas fa-lock"></i> Confirm Password
+                        </label>
+                        <input type="password" id="signup-confirm-password" placeholder="Confirm your password" required>
+                        <div class="error-message">Passwords do not match</div>
                     </div>
                     
                     <div class="modal-actions">
                         <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
                     </div>
                 </form>
                 
                 <div class="auth-switch">
-                    <p>Already have an account? <a href="#" id="switch-to-login">Login</a></p>
+                    <p>Already have an account? <a href="#" id="switch-to-login">Sign in here</a></p>
                 </div>
             </div>
         </div>
