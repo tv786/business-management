@@ -64,6 +64,19 @@
                 </nav>
                 
                 <div class="header-actions">
+                    <div class="user-section" id="user-section">
+                        <button class="btn-login" id="login-btn">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </button>
+                        <div class="user-profile" id="user-profile" style="display: none;">
+                            <img src="" alt="User" class="user-avatar" id="user-avatar">
+                            <span class="user-name" id="user-name"></span>
+                            <button class="btn-logout" id="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                    </div>
                     <button class="btn-icon" id="settings-btn" title="Settings">
                         <i class="fas fa-cog"></i>
                     </button>
@@ -646,6 +659,77 @@
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
         </div>
+
+        <!-- Login Modal -->
+        <div id="login-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="login-modal-title">Login</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+                
+                <div class="auth-switch">
+                    <p>Don't have an account? <a href="#" id="switch-to-signup">Sign up</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signup Modal -->
+        <div id="signup-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Sign Up</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-confirm-password">Confirm Password</label>
+                        <input type="password" id="signup-confirm-password" required>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                    </div>
+                </form>
+                
+                <div class="auth-switch">
+                    <p>Already have an account? <a href="#" id="switch-to-login">Login</a></p>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Toast Notifications -->
         <div id="toast-container" class="toast-container"></div>

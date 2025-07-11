@@ -6,11 +6,13 @@ import { ProjectManager } from './projects.js';
 import { AnalyticsManager } from './analytics.js';
 import { CalculatorManager } from './calculators.js';
 import { SettingsManager } from './settings.js';
+import { AuthManager } from './auth.js';
 import { showToast, showLoading, hideLoading } from './utils.js';
 
 class App {
     constructor() {
         this.storage = new StorageManager();
+        this.auth = new AuthManager();
         this.settings = new SettingsManager(this.storage);
         this.vendors = new VendorManager(this.storage);
         this.transactions = new TransactionManager(this.storage);
@@ -24,6 +26,7 @@ class App {
 
     init() {
         this.setupNavigation();
+        this.auth.init();
         this.setupServiceWorker();
         this.setupOfflineDetection();
         this.setupDataManagement();
