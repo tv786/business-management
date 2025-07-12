@@ -660,14 +660,18 @@
             <div class="spinner"></div>
         </div>
 
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+
+        
         <!-- Login Modal -->
-        <div id="login-modal" class="modal">
+        <div id="login-modal" class="auth-modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <i class="fas fa-sign-in-alt" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                    <i class="fas fa-sign-in-alt" style="font-size: 1.5rem; margin-bottom: 0.25rem;"></i>
                     <h2 id="login-modal-title">Welcome Back</h2>
-                    <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Sign in to your account</p>
-                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                    <!-- <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Sign in to your account</p> -->
+                    <button class="close-btn" onclick="window.app.auth.closeAllModals()">&times;</button>
                 </div>
                 <form id="login-form">
                     <div class="form-group">
@@ -687,7 +691,7 @@
                     </div>
                     
                     <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="window.app.auth.closeAllModals()">Cancel</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-sign-in-alt"></i> Sign In
                         </button>
@@ -701,13 +705,13 @@
         </div>
 
         <!-- Signup Modal -->
-        <div id="signup-modal" class="modal">
+        <div id="signup-modal" class="auth-modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <i class="fas fa-user-plus" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                    <i class="fas fa-user-plus" style="font-size: 1.5rem; margin-bottom: 0.25rem;"></i>
                     <h2>Create Account</h2>
-                    <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Join our business management platform</p>
-                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                    <!-- <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Join our business management platform</p> -->
+                    <button class="close-btn" onclick="window.app.auth.closeAllModals()">&times;</button>
                 </div>
                 <form id="signup-form">
                     <div class="form-group">
@@ -758,10 +762,6 @@
                 </div>
             </div>
         </div>
-
-
-        <!-- Toast Notifications -->
-        <div id="toast-container" class="toast-container"></div>
     </div>
 
     <!-- Scripts -->

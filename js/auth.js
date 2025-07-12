@@ -7,6 +7,12 @@ export class AuthManager {
         this.authKey = 'business_auth_user';
         this.demoMode = false;
     }
+    
+    // Add to AuthManager class in auth.js
+    closeModal() {
+        document.getElementById('login-modal').style.display = 'none';
+        document.getElementById('signup-modal').style.display = 'none';
+    }
 
     init() {
         this.loadStoredAuth();
@@ -170,12 +176,20 @@ export class AuthManager {
         }
     }
 
+    // In the AuthManager class, update these methods:
     showLoginModal() {
         this.closeAllModals();
         const modal = document.getElementById('login-modal');
         if (modal) {
-            modal.style.display = 'flex';
+            modal.classList.add('show');
             document.getElementById('login-email').focus();
+            
+            // Add click outside handler
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.closeAllModals();
+                }
+            });
         }
     }
 
@@ -183,17 +197,30 @@ export class AuthManager {
         this.closeAllModals();
         const modal = document.getElementById('signup-modal');
         if (modal) {
-            modal.style.display = 'flex';
+            modal.classList.add('show');
             document.getElementById('signup-name').focus();
+            
+            // Add click outside handler
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.closeAllModals();
+                }
+            });
         }
     }
 
     closeAllModals() {
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => {
-            modal.style.display = 'none';
-        });
+        const loginModal = document.getElementById('login-modal');
+        const signupModal = document.getElementById('signup-modal');
+        
+        if (loginModal) loginModal.classList.remove('show');
+        if (signupModal) signupModal.classList.remove('show');
+        
+        // Remove event listeners to prevent memory leaks
+        if (loginModal) loginModal.removeEventListener('click', this.closeAllModals);
+        if (signupModal) signupModal.removeEventListener('click', this.closeAllModals);
     }
+
 
     async handleLogin() {
         const emailInput = document.getElementById('login-email');
