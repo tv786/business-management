@@ -1,18 +1,19 @@
 // Main application entry point
-import { StorageManager } from './storage.js';
+import { FirebaseStorageManager } from './firebase-storage.js';
 import { VendorManager } from './vendors.js';
 import { TransactionManager } from './transactions.js';
 import { ProjectManager } from './projects.js';
 import { AnalyticsManager } from './analytics.js';
 import { CalculatorManager } from './calculators.js';
 import { SettingsManager } from './settings.js';
-import { AuthManager } from './auth.js';
+import { FirebaseAuthManager } from './firebase-auth.js';
 import { showToast, showLoading, hideLoading } from './utils.js';
+import { addFirebaseIntegration } from './firebase-integration.js';
 
 class App {
     constructor() {
-        this.storage = new StorageManager();
-        this.auth = new AuthManager();
+        this.storage = new FirebaseStorageManager();
+        this.auth = new FirebaseAuthManager();
         this.settings = new SettingsManager(this.storage);
         this.vendors = new VendorManager(this.storage);
         this.transactions = new TransactionManager(this.storage);
@@ -26,7 +27,8 @@ class App {
 
     init() {
         this.setupNavigation();
-        this.auth.init();
+        // Setup Firebase integration
+        this.setupFirebaseIntegration();
         this.setupServiceWorker();
         this.setupOfflineDetection();
         this.setupDataManagement();

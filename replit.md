@@ -17,10 +17,11 @@ Preferred communication style: Simple, everyday language.
 - **Component Architecture**: Modular JavaScript classes for each business domain
 
 ### Backend Architecture
-- **Client-Side Only**: No traditional backend server
-- **Data Storage**: Browser's localStorage for persistent data storage
+- **Firebase Integration**: Google Firebase for authentication and cloud storage
+- **Data Storage**: Hybrid approach - localStorage for offline, Firestore for cloud sync
+- **Authentication**: Firebase Auth with email/password and Google sign-in
 - **Offline-First**: Complete functionality without internet connection
-- **Data Synchronization**: Not implemented (future enhancement opportunity)
+- **Data Synchronization**: Real-time sync across devices when authenticated
 
 ## Key Components
 
