@@ -448,12 +448,47 @@ export class FirebaseAuthManager {
 
         try {
             await this.authMethods.signOut(this.auth);
+            
+            // Clear all user data from localStorage
+            this.clearUserData();
+            
+            // Refresh all UI sections to show empty state
+            this.refreshAllSections();
+            
             console.log('User logged out');
             showToast('Logged out successfully', 'success');
             
         } catch (error) {
             console.error('Logout error:', error);
             showToast('Logout failed. Please try again.', 'error');
+        }
+    }
+    
+    // Clear all user data from localStorage
+    clearUserData() {
+        const dataKeys = [
+            'business_management_vendors',
+            'business_management_transactions', 
+            'business_management_projects',
+            'business_management_last_sync'
+        ];
+        
+        dataKeys.forEach(key => {
+            localStorage.removeItem(key);
+        });
+        
+        console.log('User data cleared from localStorage');
+    }
+    
+    // Refresh all UI sections to show empty state
+    refreshAllSections() {
+        // Trigger refresh of all sections through the main app
+        if (window.app) {
+            // Reset data in all managers
+            if (window.app.vendors) window.app.vendors.loadVendors();
+            if (window.app.transactions) window.app.transactions.loadTransactions();
+            if (window.app.projects) window.app.projects.loadProjects();
+            if (window.app.analytics) window.app.analytics.loadDashboard();
         }
     }
 

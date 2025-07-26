@@ -46,6 +46,8 @@ export class FirebaseStorageManager {
             } else {
                 console.log('User signed out');
                 this.currentUser = null;
+                // Clear data when user signs out
+                this.clearLocalUserData();
             }
         });
         
@@ -175,6 +177,11 @@ export class FirebaseStorageManager {
     }
 
     addVendor(vendor) {
+        if (!this.requireAuth()) {
+            console.log('Authentication required for adding vendor');
+            return Promise.resolve(null);
+        }
+        
         const vendors = this.getVendors();
         vendor.id = this.generateId();
         vendor.createdAt = new Date().toISOString();
@@ -269,6 +276,11 @@ export class FirebaseStorageManager {
     }
 
     addTransaction(transaction) {
+        if (!this.requireAuth()) {
+            console.log('Authentication required for adding transaction');
+            return Promise.resolve(null);
+        }
+        
         const transactions = this.getTransactions();
         transaction.id = this.generateId();
         transaction.createdAt = new Date().toISOString();
@@ -335,6 +347,11 @@ export class FirebaseStorageManager {
     }
 
     addProject(project) {
+        if (!this.requireAuth()) {
+            console.log('Authentication required for adding project');
+            return Promise.resolve(null);
+        }
+        
         const projects = this.getProjects();
         project.id = this.generateId();
         project.createdAt = new Date().toISOString();
@@ -449,6 +466,33 @@ export class FirebaseStorageManager {
             console.error('Error getting user profile:', error);
             return null;
         }
+    }
+
+    // Clear local user data when logging out
+    clearLocalUserData() {
+        const dataKeys = [
+            this.localStorageKeys.vendors,
+            this.localStorageKeys.transactions,
+            this.localStorageKeys.projects,
+            this.localStorageKeys.lastSync
+        ];
+        
+        dataKeys.forEach(key => {
+            localStorage.removeItem(key);
+        });
+        
+        // Initialize empty data structure
+        this.initializeData();
+        
+        console.log('Local user data cleared');
+    }
+
+    // Check if user is authenticated before allowing operations
+    requireAuth() {
+        if (!this.currentUser) {
+            return false;
+        }
+        return true;
     }
 
     // Utility functions
