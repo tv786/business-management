@@ -474,6 +474,7 @@ export class FirebaseStorageManager {
             this.localStorageKeys.vendors,
             this.localStorageKeys.transactions,
             this.localStorageKeys.projects,
+            this.localStorageKeys.settings,  // Added settings to be cleared
             this.localStorageKeys.lastSync
         ];
         

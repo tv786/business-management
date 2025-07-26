@@ -470,6 +470,7 @@ export class FirebaseAuthManager {
             'business_management_vendors',
             'business_management_transactions', 
             'business_management_projects',
+            'business_management_settings',  // Added settings to be cleared
             'business_management_last_sync'
         ];
         

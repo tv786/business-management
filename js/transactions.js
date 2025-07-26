@@ -439,6 +439,11 @@ export class TransactionManager {
     }
 
     showTransactionModal(transaction = null) {
+        // Check authentication
+        if (!this.storage.requireAuth()) {
+            showToast('Please login to manage transactions', 'warning');
+            return;
+        }
         this.currentTransaction = transaction;
         const title = transaction ? 'Edit Transaction' : 'Add Transaction';
         

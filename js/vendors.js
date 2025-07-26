@@ -253,6 +253,11 @@ export class VendorManager {
     }
 
     showVendorModal(vendor = null) {
+        // Check authentication
+        if (!this.storage.requireAuth()) {
+            showToast('Please login to manage vendors', 'warning');
+            return;
+        }
         this.currentVendor = vendor;
         const title = vendor ? 'Edit Vendor' : 'Add Vendor';
         

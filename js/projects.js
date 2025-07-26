@@ -308,6 +308,11 @@ export class ProjectManager {
     }
 
     showProjectModal(project = null) {
+        // Check authentication
+        if (!this.storage.requireAuth()) {
+            showToast('Please login to manage projects', 'warning');
+            return;
+        }
         this.currentProject = project;
         const title = project ? 'Edit Project' : 'Add Project';
         
