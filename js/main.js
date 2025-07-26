@@ -14,6 +14,8 @@ class App {
     constructor() {
         this.storage = new FirebaseStorageManager();
         this.auth = new FirebaseAuthManager();
+        
+        // Initialize other managers after storage is ready
         this.settings = new SettingsManager(this.storage);
         this.vendors = new VendorManager(this.storage);
         this.transactions = new TransactionManager(this.storage);
@@ -21,14 +23,20 @@ class App {
         this.analytics = new AnalyticsManager(this.storage);
         this.calculators = new CalculatorManager();
         
+        // Add Firebase integration methods
+        addFirebaseIntegration(this);
+        
         this.currentSection = 'dashboard';
+        
+        // Initialize with async support
         this.init();
     }
 
-    init() {
+    async init() {
+        // Wait for storage to initialize
+        await this.storage.init();
+        
         this.setupNavigation();
-        // Setup Firebase integration
-        this.setupFirebaseIntegration();
         this.setupServiceWorker();
         this.setupOfflineDetection();
         this.setupDataManagement();

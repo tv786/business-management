@@ -23,38 +23,41 @@ export class FirebaseStorageManager {
     }
 
     async init() {
-        try {
-            // Import Firebase services
-            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-            const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
-            const { getFirestore, enableNetwork, disableNetwork } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-            
-            // Initialize Firebase
-            const app = initializeApp(firebaseConfig);
-            this.auth = getAuth(app);
-            this.db = getFirestore(app);
-            
-            // Listen for auth state changes
-            onAuthStateChanged(this.auth, (user) => {
-                this.currentUser = user;
-                if (user) {
-                    console.log('User authenticated:', user.uid);
-                    this.syncDataFromCloud();
-                } else {
-                    console.log('User signed out');
-                    this.currentUser = null;
-                }
-            });
-            
-            this.isInitialized = true;
-            console.log('Firebase initialized successfully');
-            
-        } catch (error) {
-            console.error('Failed to initialize Firebase:', error);
-            console.log('Falling back to localStorage only');
-            this.isInitialized = false;
-        }
+    try {
+        // Import Firebase services
+        const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+        const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+        const { getFirestore, enableNetwork, disableNetwork } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        this.auth = getAuth(app);
+        this.db = getFirestore(app);
+        
+        // Initialize data
+        this.initializeData();
+        
+        // Listen for auth state changes
+        onAuthStateChanged(this.auth, (user) => {
+            this.currentUser = user;
+            if (user) {
+                console.log('User authenticated:', user.uid);
+                this.syncDataFromCloud();
+            } else {
+                console.log('User signed out');
+                this.currentUser = null;
+            }
+        });
+        
+        this.isInitialized = true;
+        console.log('Firebase initialized successfully');
+        
+    } catch (error) {
+        console.error('Failed to initialize Firebase:', error);
+        console.log('Falling back to localStorage only');
+        this.isInitialized = false;
     }
+}
 
     setupOfflineDetection() {
         window.addEventListener('online', () => {
@@ -209,6 +212,32 @@ export class FirebaseStorageManager {
             console.error('Error loading transactions:', error);
             return [];
         }
+    }
+
+    // In firebase-storage.js, add to the FirebaseStorageManager class
+    getVendorById(id) {
+        const vendors = this.getVendors();
+        return vendors.find(v => v.id === id) || null;
+    }
+
+    getProjectById(id) {
+        const projects = this.getProjects();
+        return projects.find(p => p.id === id) || null;
+    }
+
+    getTransactionById(id) {
+        const transactions = this.getTransactions();
+        return transactions.find(t => t.id === id) || null;
+    }
+
+    getTransactionsByProject(projectId) {
+        const transactions = this.getTransactions();
+        return transactions.filter(t => t.projectId === projectId);
+    }
+
+    getTransactionsByVendor(vendorId) {
+        const transactions = this.getTransactions();
+        return transactions.filter(t => t.vendorId === vendorId);
     }
 
     async saveTransactions(transactions) {
