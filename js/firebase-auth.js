@@ -142,9 +142,9 @@ export class FirebaseAuthManager {
             googleSignupBtn.addEventListener('click', () => this.signInWithGoogle());
         }
 
-        // Close modals when clicking outside
+        // Close modals when clicking outside or on close button
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
+            if (e.target.classList.contains('modal') || e.target.classList.contains('btn-close')) {
                 this.closeModal();
             }
         });
@@ -451,7 +451,13 @@ export class FirebaseAuthManager {
     }
 
     async logout() {
-        if (!this.isInitialized || !this.currentUser) {
+        if (!this.isInitialized) {
+            showToast('Authentication system not available', 'error');
+            return;
+        }
+        
+        if (!this.currentUser) {
+            showToast('No user logged in', 'warning');
             return;
         }
 
@@ -464,13 +470,13 @@ export class FirebaseAuthManager {
             // Refresh all UI sections to show empty state
             this.refreshAllSections();
             
-            console.log('User logged out');
+            console.log('User logged out successfully');
             showToast('Logged out successfully', 'success');
             
             // Force page reload after a short delay to ensure clean state
             setTimeout(() => {
                 window.location.reload();
-            }, 1000);
+            }, 1500);
             
         } catch (error) {
             console.error('Logout error:', error);
@@ -546,6 +552,12 @@ export class FirebaseAuthManager {
                 }
                 if (window.app.analytics) {
                     window.app.analytics.loadDashboard();
+                }
+                
+                // Refresh settings and company name display
+                if (window.app.settings) {
+                    const settings = window.app.settings.loadSettings();
+                    window.app.settings.applySettings(settings);
                 }
                 
                 // Force reload current section to ensure fresh data
