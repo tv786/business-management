@@ -313,6 +313,9 @@ export class FirebaseAuthManager {
             showToast('Login successful!', 'success');
             this.closeModal();
             
+            // Force refresh of all data after login
+            this.forceDataRefresh();
+            
         } catch (error) {
             console.error('Login error:', error);
             let errorMessage = 'Login failed. Please try again.';
@@ -381,6 +384,9 @@ export class FirebaseAuthManager {
             showToast(`Welcome, ${name}! Account created successfully.`, 'success');
             this.closeModal();
             
+            // Force refresh of all data after signup
+            this.forceDataRefresh();
+            
         } catch (error) {
             console.error('Signup error:', error);
             let errorMessage = 'Signup failed. Please try again.';
@@ -421,6 +427,9 @@ export class FirebaseAuthManager {
             showToast(`Welcome, ${user.displayName}!`, 'success');
             this.closeModal();
             
+            // Force refresh of all data after Google sign-in
+            this.forceDataRefresh();
+            
         } catch (error) {
             console.error('Google sign-in error:', error);
             let errorMessage = 'Google sign-in failed. Please try again.';
@@ -458,6 +467,11 @@ export class FirebaseAuthManager {
             console.log('User logged out');
             showToast('Logged out successfully', 'success');
             
+            // Force page reload after a short delay to ensure clean state
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+            
         } catch (error) {
             console.error('Logout error:', error);
             showToast('Logout failed. Please try again.', 'error');
@@ -486,11 +500,59 @@ export class FirebaseAuthManager {
         // Trigger refresh of all sections through the main app
         if (window.app) {
             // Reset data in all managers
-            if (window.app.vendors) window.app.vendors.loadVendors();
-            if (window.app.transactions) window.app.transactions.loadTransactions();
-            if (window.app.projects) window.app.projects.loadProjects();
-            if (window.app.analytics) window.app.analytics.loadDashboard();
+            if (window.app.vendors) {
+                window.app.vendors.renderVendorsTable();
+                window.app.vendors.setupFilterDropdowns();
+            }
+            if (window.app.transactions) {
+                window.app.transactions.renderTransactionsTable();
+                window.app.transactions.populateFilterDropdowns();
+            }
+            if (window.app.projects) {
+                window.app.projects.renderProjectsGrid();
+            }
+            if (window.app.analytics) {
+                window.app.analytics.loadDashboard();
+            }
+            
+            // Force reload current section
+            const currentSection = window.app.currentSection || 'dashboard';
+            setTimeout(() => {
+                window.app.loadSection(currentSection);
+            }, 100);
         }
+    }
+    
+    // Force refresh of all data after login
+    forceDataRefresh() {
+        // Small delay to ensure Firebase auth state is fully updated
+        setTimeout(() => {
+            if (window.app) {
+                // Clear any cached data first
+                const currentTime = Date.now();
+                localStorage.setItem('business_management_last_refresh', currentTime.toString());
+                
+                // Refresh all managers
+                if (window.app.vendors) {
+                    window.app.vendors.renderVendorsTable();
+                    window.app.vendors.setupFilterDropdowns();
+                }
+                if (window.app.transactions) {
+                    window.app.transactions.renderTransactionsTable();
+                    window.app.transactions.populateFilterDropdowns();
+                }
+                if (window.app.projects) {
+                    window.app.projects.renderProjectsGrid();
+                }
+                if (window.app.analytics) {
+                    window.app.analytics.loadDashboard();
+                }
+                
+                // Force reload current section to ensure fresh data
+                const currentSection = window.app.currentSection || 'dashboard';
+                window.app.loadSection(currentSection);
+            }
+        }, 200);
     }
 
     updateUIState() {

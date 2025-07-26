@@ -190,7 +190,10 @@ export class FirebaseStorageManager {
         vendor.status = vendor.status || 'active';
         
         vendors.push(vendor);
-        return this.saveVendors(vendors).then(() => vendor).catch(() => null);
+        return this.saveVendors(vendors).then(() => {
+            this.triggerDataRefresh();
+            return vendor;
+        }).catch(() => null);
     }
 
     updateVendor(id, updatedVendor) {
@@ -200,7 +203,10 @@ export class FirebaseStorageManager {
         if (index !== -1) {
             updatedVendor.updatedAt = new Date().toISOString();
             vendors[index] = { ...vendors[index], ...updatedVendor };
-            return this.saveVendors(vendors).then(() => vendors[index]).catch(() => null);
+            return this.saveVendors(vendors).then(() => {
+                this.triggerDataRefresh();
+                return vendors[index];
+            }).catch(() => null);
         }
         return null;
     }
@@ -208,7 +214,10 @@ export class FirebaseStorageManager {
     deleteVendor(id) {
         const vendors = this.getVendors();
         const filteredVendors = vendors.filter(v => v.id !== id);
-        return this.saveVendors(filteredVendors);
+        return this.saveVendors(filteredVendors).then(() => {
+            this.triggerDataRefresh();
+            return true;
+        });
     }
 
     // Transaction operations
@@ -287,7 +296,10 @@ export class FirebaseStorageManager {
         transaction.updatedAt = new Date().toISOString();
         
         transactions.push(transaction);
-        return this.saveTransactions(transactions).then(() => transaction).catch(() => null);
+        return this.saveTransactions(transactions).then(() => {
+            this.triggerDataRefresh();
+            return transaction;
+        }).catch(() => null);
     }
 
     updateTransaction(id, updatedTransaction) {
@@ -297,7 +309,10 @@ export class FirebaseStorageManager {
         if (index !== -1) {
             updatedTransaction.updatedAt = new Date().toISOString();
             transactions[index] = { ...transactions[index], ...updatedTransaction };
-            return this.saveTransactions(transactions).then(() => transactions[index]).catch(() => null);
+            return this.saveTransactions(transactions).then(() => {
+                this.triggerDataRefresh();
+                return transactions[index];
+            }).catch(() => null);
         }
         return null;
     }
@@ -305,7 +320,10 @@ export class FirebaseStorageManager {
     deleteTransaction(id) {
         const transactions = this.getTransactions();
         const filteredTransactions = transactions.filter(t => t.id !== id);
-        return this.saveTransactions(filteredTransactions);
+        return this.saveTransactions(filteredTransactions).then(() => {
+            this.triggerDataRefresh();
+            return true;
+        });
     }
 
     // Project operations
@@ -360,7 +378,10 @@ export class FirebaseStorageManager {
         project.progress = project.progress || 0;
         
         projects.push(project);
-        return this.saveProjects(projects).then(() => project).catch(() => null);
+        return this.saveProjects(projects).then(() => {
+            this.triggerDataRefresh();
+            return project;
+        }).catch(() => null);
     }
 
     updateProject(id, updatedProject) {
@@ -370,7 +391,10 @@ export class FirebaseStorageManager {
         if (index !== -1) {
             updatedProject.updatedAt = new Date().toISOString();
             projects[index] = { ...projects[index], ...updatedProject };
-            return this.saveProjects(projects).then(() => projects[index]).catch(() => null);
+            return this.saveProjects(projects).then(() => {
+                this.triggerDataRefresh();
+                return projects[index];
+            }).catch(() => null);
         }
         return null;
     }
@@ -378,7 +402,10 @@ export class FirebaseStorageManager {
     deleteProject(id) {
         const projects = this.getProjects();
         const filteredProjects = projects.filter(p => p.id !== id);
-        return this.saveProjects(filteredProjects);
+        return this.saveProjects(filteredProjects).then(() => {
+            this.triggerDataRefresh();
+            return true;
+        });
     }
 
     // Settings operations
@@ -499,6 +526,43 @@ export class FirebaseStorageManager {
     // Utility functions
     generateId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+    
+    // Auto-refresh mechanism to fix caching issues
+    triggerDataRefresh() {
+        // Small delay to ensure data is saved properly
+        setTimeout(() => {
+            if (window.app) {
+                console.log('Triggering data refresh to fix cache issues');
+                
+                // Set refresh timestamp
+                localStorage.setItem('business_management_last_refresh', Date.now().toString());
+                
+                // Refresh all UI components
+                if (window.app.vendors && window.app.currentSection === 'vendors') {
+                    window.app.vendors.renderVendorsTable();
+                    if (window.app.vendors.setupFilterDropdowns) {
+                        window.app.vendors.setupFilterDropdowns();
+                    }
+                }
+                
+                if (window.app.transactions && window.app.currentSection === 'transactions') {
+                    window.app.transactions.renderTransactionsTable();
+                    if (window.app.transactions.populateFilterDropdowns) {
+                        window.app.transactions.populateFilterDropdowns();
+                    }
+                }
+                
+                if (window.app.projects && window.app.currentSection === 'projects') {
+                    window.app.projects.renderProjectsGrid();
+                }
+                
+                // Always refresh analytics for dashboard
+                if (window.app.analytics) {
+                    window.app.analytics.loadDashboard();
+                }
+            }
+        }, 100);
     }
 
     // Initialize data with defaults if needed  
