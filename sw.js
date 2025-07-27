@@ -1,7 +1,7 @@
 // Service Worker for Business Management System
-const CACHE_NAME = 'business-management-v2.0.0';
-const STATIC_CACHE = 'static-v2.0.0';
-const DYNAMIC_CACHE = 'dynamic-v2.0.0';
+const CACHE_NAME = `business-management-v${Date.now()}`;
+const STATIC_CACHE = `static-v${Date.now()}`;
+const DYNAMIC_CACHE = `dynamic-v${Date.now()}`;
 
 // Files to cache for offline functionality
 const STATIC_FILES = [

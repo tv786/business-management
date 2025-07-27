@@ -48,7 +48,11 @@ class App {
         // Show welcome message
         setTimeout(() => {
             const settings = this.settings.loadSettings();
-            showToast(`Welcome to ${settings.companyName} Management System`, 'success');
+            const hasShownWelcome = sessionStorage.getItem('welcome_shown');
+            if (!hasShownWelcome) {
+                showToast(`Welcome to ${settings.companyName} Management System`, 'success');
+                sessionStorage.setItem('welcome_shown', 'true');
+            }
         }, 1000);
     }
 
