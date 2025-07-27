@@ -859,7 +859,7 @@ select#dashboard-period {
 
 .modal-header {
     display: flex;
-    justify-content: left;
+    justify-content: space-between;
     gap: 15px;
     align-items: center;
     padding: var(--spacing-md);
@@ -1221,7 +1221,9 @@ select#dashboard-period {
     justify-content: center;
     z-index: 1000;
 }
-
+.auth-modal .modal-header {
+    justify-content: left !important;
+}
 .auth-modal.show {
     display: flex;
 }
