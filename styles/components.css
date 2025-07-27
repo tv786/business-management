@@ -166,18 +166,27 @@ select#dashboard-period {
 /* Settings Modal Styles */
 .settings-modal {
     max-width: 800px;
-    max-height: 90vh;
+    max-height: 95vh;
     overflow-y: auto;
+}
+.settings-modal .modal-header {
+    justify-content: space-between;
 }
 
 .settings-content {
-    padding: 0;
+    padding: 0 !important;
+    max-height: 65vh !important;
+}
+.settings-content .modal-actions {
+    padding-bottom: 20px;
+    padding-right: 20px;
+    margin: 0 !important;
 }
 
 .settings-tabs {
     display: flex;
     border-bottom: 1px solid var(--gray-200);
-    margin-bottom: var(--spacing-lg);
+    /* margin-bottom: var(--spacing-lg); */
 }
 
 .tab-btn {
@@ -257,6 +266,9 @@ select#dashboard-period {
 
 .add-category input {
     flex: 1;
+    padding: var(--spacing-sm);
+    border-radius: 10px;
+    border: 1px solid var(--gray-300);
 }
 
 .add-category button {
