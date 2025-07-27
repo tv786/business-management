@@ -335,7 +335,7 @@ export class FirebaseAuthManager {
             // Auto reload page after successful login
             setTimeout(() => {
                 window.location.reload();
-            }, 1500);
+            }, 1000);
             
         } catch (error) {
             console.error('Login error:', error);
@@ -408,7 +408,7 @@ export class FirebaseAuthManager {
             // Auto reload page after successful signup
             setTimeout(() => {
                 window.location.reload();
-            }, 1500);
+            }, 1000);
             
         } catch (error) {
             console.error('Signup error:', error);
@@ -453,7 +453,7 @@ export class FirebaseAuthManager {
             // Auto reload page after successful Google sign-in
             setTimeout(() => {
                 window.location.reload();
-            }, 1500);
+            }, 1000);
             
         } catch (error) {
             console.error('Google sign-in error:', error);
@@ -493,7 +493,7 @@ export class FirebaseAuthManager {
             // Auto reload page after successful logout
             setTimeout(() => {
                 window.location.reload();
-            }, 1500);
+            }, 1000);
             
         } catch (error) {
             console.error('Logout error:', error);
