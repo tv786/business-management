@@ -475,27 +475,16 @@ export class FirebaseAuthManager {
             return;
         }
         
-        if (!this.currentUser) {
-            showToast('No user logged in', 'warning');
-            return;
-        }
-
         try {
             await this.authMethods.signOut(this.auth);
-            
-            // Clear all user data from localStorage
-            this.clearUserData();
-            
-            // Refresh all UI sections to show empty state
-            this.refreshAllSections();
-            
             console.log('User logged out successfully');
             showToast('Logged out successfully', 'success');
             
-            // Force page reload after a short delay to ensure clean state
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+            // Clear session storage flags
+            sessionStorage.removeItem('welcome_back_shown');
+            sessionStorage.removeItem('welcome_shown');
+            
+            // The auth state change listener will handle the rest
             
         } catch (error) {
             console.error('Logout error:', error);

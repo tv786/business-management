@@ -397,9 +397,9 @@ export class SettingsManager {
             window.closeModal();
             
             // Force reload to apply changes immediately
-            setTimeout(() => {
-                window.location.reload(true);
-            }, 1000);
+//            setTimeout(() => {
+//                window.location.reload(true);
+//            }, 1000);
         } catch (error) {
             console.error('Error saving settings:', error);
             showToast('Failed to save settings', 'error');
