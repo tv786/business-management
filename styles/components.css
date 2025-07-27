@@ -123,9 +123,77 @@ select#dashboard-period {
 
 .summary-value.highlight {
     color: var(--primary-color);
-    background: var(--primary-light);
-    padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* Quick Add Buttons for Transaction Form */
+.input-with-quick-add {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.input-with-quick-add select {
+    flex: 1;
+}
+
+.btn-quick-add {
+    padding: var(--spacing-xs);
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
     border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-size-sm);
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.btn-quick-add:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-quick-add:active {
+    transform: translateY(0);
+}
+
+.btn-contact-picker {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--success-color);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: var(--transition);
+    margin-top: var(--spacing-xs);
+}
+
+.btn-contact-picker:hover {
+    background: var(--success-dark);
+    transform: translateY(-1px);
+}
+
+.btn-contact-picker:disabled {
+    background: var(--gray-400);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.contact-picker-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
 }
 
 /* Transaction Table Enhancements */

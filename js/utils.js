@@ -111,6 +111,36 @@ export function formatDate(dateString, options = {}) {
     return date.toLocaleDateString('en-US', formatOptions);
 }
 
+// Contact Picker API
+export async function pickContact() {
+    if ('contacts' in navigator && 'ContactsManager' in window) {
+        try {
+            const properties = ['name', 'tel'];
+            const opts = { multiple: false };
+            
+            const contacts = await navigator.contacts.select(properties, opts);
+            if (contacts.length > 0) {
+                const contact = contacts[0];
+                return {
+                    name: contact.name?.[0] || '',
+                    phone: contact.tel?.[0] || ''
+                };
+            }
+        } catch (error) {
+            console.error('Contact picker error:', error);
+            showToast('Contact picker not available on this device', 'warning');
+        }
+    } else {
+        showToast('Contact picker not supported on this browser', 'warning');
+    }
+    return null;
+}
+
+// Check if contact picker is supported
+export function isContactPickerSupported() {
+    return 'contacts' in navigator && 'ContactsManager' in window;
+}
+
 // Date and time formatting
 export function formatDateTime(dateString) {
     if (!dateString) return 'N/A';

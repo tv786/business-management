@@ -1,5 +1,5 @@
 // Transaction management functionality
-import { showToast, formatCurrency, formatDate } from './utils.js';
+import { showToast, formatCurrency, formatDate, pickContact, isContactPickerSupported } from './utils.js';
 
 export class TransactionManager {
     constructor(storage) {
@@ -100,16 +100,26 @@ export class TransactionManager {
                     <div class="form-row">
                         <div class="form-group">
                             <label for="transaction-vendor">Vendor</label>
-                            <select id="transaction-vendor">
-                                <option value="">Select Vendor</option>
-                            </select>
+                            <div class="input-with-quick-add">
+                                <select id="transaction-vendor">
+                                    <option value="">Select Vendor</option>
+                                </select>
+                                <button type="button" class="btn-quick-add" id="quick-add-vendor" title="Add New Vendor">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="transaction-project">Project</label>
-                            <select id="transaction-project">
-                                <option value="">Select Project</option>
-                            </select>
+                            <div class="input-with-quick-add">
+                                <select id="transaction-project">
+                                    <option value="">Select Project</option>
+                                </select>
+                                <button type="button" class="btn-quick-add" id="quick-add-project" title="Add New Project">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -177,8 +187,240 @@ export class TransactionManager {
             this.saveTransaction();
         });
 
+        // Setup quick add buttons
+        document.getElementById('quick-add-vendor').addEventListener('click', () => {
+            this.showQuickAddVendorModal();
+        });
+
+        document.getElementById('quick-add-project').addEventListener('click', () => {
+            this.showQuickAddProjectModal();
+        });
+
         // Set default date to today
         document.getElementById('transaction-date').value = new Date().toISOString().split('T')[0];
+    }
+
+    showQuickAddVendorModal() {
+        const existingModal = document.getElementById('quick-vendor-modal');
+        if (existingModal) existingModal.remove();
+
+        const contactPickerSupported = isContactPickerSupported();
+        
+        const modalHTML = `
+            <div class="modal" id="quick-vendor-modal">
+                <div class="modal-header">
+                    <h3>Quick Add Vendor</h3>
+                    <button class="btn-close" onclick="this.closest('.modal').remove()">&times;</button>
+                </div>
+                <form id="quick-vendor-form" class="modal-body">
+                    <div class="form-group">
+                        <label for="quick-vendor-name">Vendor Name *</label>
+                        <div class="contact-picker-wrapper">
+                            <input type="text" id="quick-vendor-name" required>
+                            ${contactPickerSupported ? `
+                                <button type="button" class="btn-contact-picker" id="vendor-contact-picker">
+                                    <i class="fas fa-address-book"></i>
+                                    Pick from Contacts
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quick-vendor-phone">Phone Number</label>
+                        <input type="tel" id="quick-vendor-phone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quick-vendor-category">Category</label>
+                        <select id="quick-vendor-category">
+                            <option value="">Select Category</option>
+                            <option value="supplier">Supplier</option>
+                            <option value="contractor">Contractor</option>
+                            <option value="service-provider">Service Provider</option>
+                            <option value="consultant">Consultant</option>
+                            <option value="client">Client</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Vendor</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.getElementById('modal-overlay').insertAdjacentHTML('beforeend', modalHTML);
+
+        // Setup contact picker for vendor
+        if (contactPickerSupported) {
+            document.getElementById('vendor-contact-picker').addEventListener('click', async () => {
+                const contact = await pickContact();
+                if (contact) {
+                    document.getElementById('quick-vendor-name').value = contact.name;
+                    document.getElementById('quick-vendor-phone').value = contact.phone;
+                }
+            });
+        }
+
+        // Setup form submission
+        document.getElementById('quick-vendor-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveQuickVendor();
+        });
+    }
+
+    showQuickAddProjectModal() {
+        const existingModal = document.getElementById('quick-project-modal');
+        if (existingModal) existingModal.remove();
+
+        const contactPickerSupported = isContactPickerSupported();
+        
+        const modalHTML = `
+            <div class="modal" id="quick-project-modal">
+                <div class="modal-header">
+                    <h3>Quick Add Project</h3>
+                    <button class="btn-close" onclick="this.closest('.modal').remove()">&times;</button>
+                </div>
+                <form id="quick-project-form" class="modal-body">
+                    <div class="form-group">
+                        <label for="quick-project-name">Project Name *</label>
+                        <input type="text" id="quick-project-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quick-project-client">Client Name</label>
+                        <div class="contact-picker-wrapper">
+                            <input type="text" id="quick-project-client">
+                            ${contactPickerSupported ? `
+                                <button type="button" class="btn-contact-picker" id="project-contact-picker">
+                                    <i class="fas fa-address-book"></i>
+                                    Pick from Contacts
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quick-project-phone">Client Phone</label>
+                        <input type="tel" id="quick-project-phone">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quick-project-type">Project Type</label>
+                            <select id="quick-project-type">
+                                <option value="">Select Type</option>
+                                <option value="construction">Construction</option>
+                                <option value="renovation">Renovation</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="consultation">Consultation</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="quick-project-budget">Budget</label>
+                            <input type="number" id="quick-project-budget" step="0.01" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Project</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.getElementById('modal-overlay').insertAdjacentHTML('beforeend', modalHTML);
+
+        // Setup contact picker for project client
+        if (contactPickerSupported) {
+            document.getElementById('project-contact-picker').addEventListener('click', async () => {
+                const contact = await pickContact();
+                if (contact) {
+                    document.getElementById('quick-project-client').value = contact.name;
+                    document.getElementById('quick-project-phone').value = contact.phone;
+                }
+            });
+        }
+
+        // Setup form submission
+        document.getElementById('quick-project-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveQuickProject();
+        });
+    }
+
+    saveQuickVendor() {
+        const vendorData = {
+            name: document.getElementById('quick-vendor-name').value.trim(),
+            phone: document.getElementById('quick-vendor-phone').value.trim(),
+            category: document.getElementById('quick-vendor-category').value,
+            status: 'active',
+            email: '',
+            address: '',
+            notes: 'Added via quick add during transaction creation'
+        };
+
+        if (!vendorData.name) {
+            showToast('Please enter a vendor name', 'error');
+            return;
+        }
+
+        const savedVendor = this.storage.addVendor(vendorData);
+        if (savedVendor) {
+            showToast('Vendor added successfully', 'success');
+            
+            // Close modal
+            document.getElementById('quick-vendor-modal').remove();
+            
+            // Refresh vendor dropdown and select the new vendor
+            this.populateFilterDropdowns();
+            document.getElementById('transaction-vendor').value = savedVendor.id;
+        } else {
+            showToast('Failed to add vendor', 'error');
+        }
+    }
+
+    saveQuickProject() {
+        const projectData = {
+            name: document.getElementById('quick-project-name').value.trim(),
+            client: document.getElementById('quick-project-client').value.trim(),
+            clientPhone: document.getElementById('quick-project-phone').value.trim(),
+            type: document.getElementById('quick-project-type').value,
+            budget: parseFloat(document.getElementById('quick-project-budget').value) || null,
+            status: 'planning',
+            progress: 0,
+            location: '',
+            startDate: '',
+            endDate: '',
+            clientContact: '',
+            description: 'Created via quick add during transaction creation',
+            notes: ''
+        };
+
+        if (!projectData.name) {
+            showToast('Please enter a project name', 'error');
+            return;
+        }
+
+        const savedProject = this.storage.addProject(projectData);
+        if (savedProject) {
+            showToast('Project added successfully', 'success');
+            
+            // Close modal
+            document.getElementById('quick-project-modal').remove();
+            
+            // Refresh project dropdown and select the new project
+            this.populateFilterDropdowns();
+            document.getElementById('transaction-project').value = savedProject.id;
+        } else {
+            showToast('Failed to add project', 'error');
+        }
     }
 
     loadTransactions() {
