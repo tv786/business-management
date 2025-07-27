@@ -267,9 +267,21 @@ export class FirebaseAuthManager {
     }
 
     closeModal() {
-        document.getElementById('login-modal').style.display = 'none';
-        document.getElementById('signup-modal').style.display = 'none';
+        const loginModal = document.getElementById('login-modal');
+        const signupModal = document.getElementById('signup-modal');
+        
+        if (loginModal) loginModal.style.display = 'none';
+        if (signupModal) signupModal.style.display = 'none';
+        
+        // Also hide the modal overlay if needed
+        const overlay = document.getElementById('modal-overlay');
+        if (overlay) overlay.style.display = 'none';
+        
         this.clearFormErrors();
+    }
+    // Add this new method to close all modals
+    closeAllModals() {
+        this.closeModal();
     }
 
     clearFormErrors() {
