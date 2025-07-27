@@ -48,9 +48,16 @@ export class FirebaseAuthManager {
                 
                 if (user) {
                     console.log('User authenticated:', user.uid);
-                    showToast(`Welcome back, ${user.displayName || user.email}!`, 'success');
+                    // Only show welcome back message on fresh login, not on every reload
+                    const hasShownWelcomeBack = sessionStorage.getItem('welcome_back_shown');
+                    if (!hasShownWelcomeBack) {
+                        showToast(`Welcome back, ${user.displayName || user.email}!`, 'success');
+                        sessionStorage.setItem('welcome_back_shown', 'true');
+                    }
                 } else {
                     console.log('User signed out');
+                    // Clear the welcome back flag when user signs out
+                    sessionStorage.removeItem('welcome_back_shown');
                 }
                 
                 this.updateUIState();
