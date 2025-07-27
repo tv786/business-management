@@ -207,11 +207,12 @@ export class TransactionManager {
         const contactPickerSupported = isContactPickerSupported();
         
         const modalHTML = `
-            <div class="modal" id="quick-vendor-modal">
-                <div class="modal-header">
-                    <h3>Quick Add Vendor</h3>
-                    <button class="btn-close" onclick="this.closest('.modal').remove()">&times;</button>
-                </div>
+            <div class="modal-overlay" id="quick-vendor-modal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>Quick Add Vendor</h3>
+                        <button class="btn-close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+                    </div>
                 <form id="quick-vendor-form" class="modal-body">
                     <div class="form-group">
                         <label for="quick-vendor-name">Vendor Name *</label>
@@ -245,14 +246,20 @@ export class TransactionManager {
                     </div>
                     
                     <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
                         <button type="submit" class="btn btn-primary">Add Vendor</button>
                     </div>
-                </form>
+                    </form>
+                </div>
             </div>
         `;
 
-        document.getElementById('modal-overlay').insertAdjacentHTML('beforeend', modalHTML);
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Show the modal with animation
+        setTimeout(() => {
+            document.getElementById('quick-vendor-modal').classList.add('show');
+        }, 10);
 
         // Setup contact picker for vendor
         if (contactPickerSupported) {
@@ -279,11 +286,12 @@ export class TransactionManager {
         const contactPickerSupported = isContactPickerSupported();
         
         const modalHTML = `
-            <div class="modal" id="quick-project-modal">
-                <div class="modal-header">
-                    <h3>Quick Add Project</h3>
-                    <button class="btn-close" onclick="this.closest('.modal').remove()">&times;</button>
-                </div>
+            <div class="modal-overlay" id="quick-project-modal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>Quick Add Project</h3>
+                        <button class="btn-close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+                    </div>
                 <form id="quick-project-form" class="modal-body">
                     <div class="form-group">
                         <label for="quick-project-name">Project Name *</label>
@@ -328,14 +336,20 @@ export class TransactionManager {
                     </div>
                     
                     <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
                         <button type="submit" class="btn btn-primary">Add Project</button>
                     </div>
-                </form>
+                    </form>
+                </div>
             </div>
         `;
 
-        document.getElementById('modal-overlay').insertAdjacentHTML('beforeend', modalHTML);
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Show the modal with animation
+        setTimeout(() => {
+            document.getElementById('quick-project-modal').classList.add('show');
+        }, 10);
 
         // Setup contact picker for project client
         if (contactPickerSupported) {
