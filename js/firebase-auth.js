@@ -332,8 +332,10 @@ export class FirebaseAuthManager {
             showToast('Login successful!', 'success');
             this.closeModal();
             
-            // Force refresh of all data after login
-            this.forceDataRefresh();
+            // Auto reload page after successful login
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
             
         } catch (error) {
             console.error('Login error:', error);
@@ -403,8 +405,10 @@ export class FirebaseAuthManager {
             showToast(`Welcome, ${name}! Account created successfully.`, 'success');
             this.closeModal();
             
-            // Force refresh of all data after signup
-            this.forceDataRefresh();
+            // Auto reload page after successful signup
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
             
         } catch (error) {
             console.error('Signup error:', error);
@@ -446,8 +450,10 @@ export class FirebaseAuthManager {
             showToast(`Welcome, ${user.displayName}!`, 'success');
             this.closeModal();
             
-            // Force refresh of all data after Google sign-in
-            this.forceDataRefresh();
+            // Auto reload page after successful Google sign-in
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
             
         } catch (error) {
             console.error('Google sign-in error:', error);
@@ -484,7 +490,10 @@ export class FirebaseAuthManager {
             sessionStorage.removeItem('welcome_back_shown');
             sessionStorage.removeItem('welcome_shown');
             
-            // The auth state change listener will handle the rest
+            // Auto reload page after successful logout
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
             
         } catch (error) {
             console.error('Logout error:', error);
