@@ -153,6 +153,7 @@
     .data-table th,
     .data-table td {
         padding: var(--spacing-sm);
+        min-width: 100px;
     }
     
     .modal {
