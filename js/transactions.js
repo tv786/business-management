@@ -1,5 +1,5 @@
 // Transaction management functionality
-import { showToast, formatCurrency, formatDate, pickContact, isContactPickerSupported } from './utils.js';
+import { showToast, formatCurrency, formatDate, formatDateWithTime, pickContact, isContactPickerSupported } from './utils.js';
 
 export class TransactionManager {
     constructor(storage) {
@@ -92,8 +92,8 @@ export class TransactionManager {
                         </div>
                         
                         <div class="form-group">
-                            <label for="transaction-date">Date *</label>
-                            <input type="date" id="transaction-date" required>
+                            <label for="transaction-date">Date & Time *</label>
+                            <input type="datetime-local" id="transaction-date" required>
                         </div>
                     </div>
                     
@@ -509,7 +509,7 @@ export class TransactionManager {
             
             return `
                 <tr data-transaction-id="${transaction.id}">
-                    <td>${formatDate(transaction.date)}</td>
+                    <td>${formatDateWithTime(transaction.date)}</td>
                     <td><span class="status-badge ${transaction.type}">${transaction.type}</span></td>
                     <td><span class="category-badge">${transaction.category || 'N/A'}</span></td>
                     <td>${vendor ? vendor.name : 'N/A'}</td>
@@ -713,7 +713,15 @@ export class TransactionManager {
         
         // Set default date to today if adding new
         if (!transaction) {
-            document.getElementById('transaction-date').value = new Date().toISOString().split('T')[0];
+            // Set to current date with current time
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            document.getElementById('transaction-date').value = `${year}-${month}-${day}T${hours}:${minutes}`;
         }
         
         // Populate form if editing
@@ -810,8 +818,8 @@ export class TransactionManager {
                     </div>
                     
                     <div class="info-item">
-                        <label>Date:</label>
-                        <span>${formatDate(transaction.date)}</span>
+                        <label>Date & Time:</label>
+                        <span>${formatDateWithTime(transaction.date)}</span>
                     </div>
                     
                     <div class="info-item">

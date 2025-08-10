@@ -489,3 +489,24 @@ body {
         padding: 4px 8px;
     }
 }
+
+/* Timestamp styling */
+.timestamp {
+    color: var(--gray-500);
+    font-size: var(--font-size-xs);
+    font-weight: 400;
+    display: block;
+    margin-top: 2px;
+}
+
+/* Table date cell styling */
+.transactions-table td:first-child {
+    line-height: 1.4;
+}
+
+/* Responsive timestamp */
+@media (max-width: 768px) {
+    .timestamp {
+        font-size: 10px;
+    }
+}

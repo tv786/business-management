@@ -111,6 +111,32 @@ export function formatDate(dateString, options = {}) {
     return date.toLocaleDateString('en-US', formatOptions);
 }
 
+// Date formatting with timestamp
+export function formatDateWithTime(dateString, options = {}) {
+    if (!dateString) return 'N/A';
+    
+    const date = new Date(dateString);
+    
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    
+    const dateOptions = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    };
+    
+    const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    };
+    
+    const formattedDate = date.toLocaleDateString('en-US', dateOptions);
+    const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
+    
+    return `${formattedDate}<br><small class="timestamp">${formattedTime}</small>`;
+}
+
 // Contact Picker API
 export async function pickContact() {
     if ('contacts' in navigator && 'ContactsManager' in window) {
