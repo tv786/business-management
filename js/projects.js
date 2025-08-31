@@ -74,7 +74,7 @@ export class ProjectManager {
                         </div>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label for="project-location">Location</label>
                         <input type="text" id="project-location">
                     </div>
@@ -125,7 +125,7 @@ export class ProjectManager {
                         <textarea id="project-description" rows="3"></textarea>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label for="project-notes">Notes</label>
                         <textarea id="project-notes" rows="2"></textarea>
                     </div>
