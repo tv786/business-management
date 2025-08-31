@@ -749,12 +749,12 @@ export class TransactionManager {
             amount: parseFloat(document.getElementById('transaction-amount').value),
             category: document.getElementById('transaction-category').value,
             paymentMethod: document.getElementById('transaction-payment-method').value,
-            description: document.getElementById('transaction-description').value.trim(),
+            description: document.getElementById('transaction-description').value.trim() || '-',
             notes: document.getElementById('transaction-notes').value.trim()
         };
 
         // Validate required fields
-        if (!transactionData.type || !transactionData.date || !transactionData.amount || !transactionData.description) {
+        if (!transactionData.type || !transactionData.date || !transactionData.amount) {
             showToast('Please fill in all required fields', 'error');
             return;
         }
