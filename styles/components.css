@@ -773,6 +773,49 @@ select#dashboard-period {
     display: block;
 }
 
+/* Payment Status Styles */
+.payment-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.payment-status.paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.payment-status.credit {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.payment-status.partial {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.action-btn.pay {
+    background: #28a745;
+    color: white;
+}
+
+.action-btn.pay:hover {
+    background: #218838;
+}
+
+/* Summary Card Credit Style */
+.summary-value.credit {
+    color: #dc3545;
+    font-weight: 600;
+}
+
 .calc-result h4 {
     font-size: var(--font-size-base);
     font-weight: 600;

@@ -158,7 +158,27 @@ export class TransactionManager {
                             <option value="upi">UPI</option>
                             <option value="bank-transfer">Bank Transfer</option>
                             <option value="card">Card</option>
+                            <option value="credit">Credit (Pay Later)</option>
                         </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transaction-payment-status">Payment Status</label>
+                        <select id="transaction-payment-status">
+                            <option value="paid">Paid</option>
+                            <option value="credit">Credit (Unpaid)</option>
+                            <option value="partial">Partially Paid</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="amount-paid-group" style="display: none;">
+                        <label for="transaction-amount-paid">Amount Paid</label>
+                        <input type="number" id="transaction-amount-paid" step="0.01" min="0" placeholder="Enter amount already paid">
+                    </div>
+                    
+                    <div class="form-group" id="due-date-group" style="display: none;">
+                        <label for="transaction-due-date">Due Date</label>
+                        <input type="date" id="transaction-due-date">
                     </div>
                     
                     <div class="form-group">
@@ -198,6 +218,27 @@ export class TransactionManager {
 
         // Set default date to today
         document.getElementById('transaction-date').value = new Date().toISOString().split('T')[0];
+        
+        // Setup payment status change handler
+        document.getElementById('transaction-payment-status').addEventListener('change', (e) => {
+            this.handlePaymentStatusChange(e.target.value);
+        });
+    }
+
+    handlePaymentStatusChange(status) {
+        const amountPaidGroup = document.getElementById('amount-paid-group');
+        const dueDateGroup = document.getElementById('due-date-group');
+        
+        if (status === 'partial') {
+            amountPaidGroup.style.display = 'block';
+            dueDateGroup.style.display = 'block';
+        } else if (status === 'credit') {
+            amountPaidGroup.style.display = 'none';
+            dueDateGroup.style.display = 'block';
+        } else {
+            amountPaidGroup.style.display = 'none';
+            dueDateGroup.style.display = 'none';
+        }
     }
 
     showQuickAddVendorModal() {
@@ -506,6 +547,18 @@ export class TransactionManager {
         tbody.innerHTML = transactions.map(transaction => {
             const vendor = this.storage.getVendorById(transaction.vendorId);
             const project = this.storage.getProjectById(transaction.projectId);
+            const paymentStatus = transaction.paymentStatus || 'paid';
+            const outstandingAmount = transaction.outstandingAmount || 0;
+            
+            // Get payment status display and color
+            const getPaymentStatusDisplay = (status) => {
+                switch(status) {
+                    case 'paid': return '<span class="payment-status paid"><i class="fas fa-check-circle"></i> Paid</span>';
+                    case 'credit': return '<span class="payment-status credit"><i class="fas fa-clock"></i> Credit</span>';
+                    case 'partial': return '<span class="payment-status partial"><i class="fas fa-hourglass-half"></i> Partial</span>';
+                    default: return '<span class="payment-status paid"><i class="fas fa-check-circle"></i> Paid</span>';
+                }
+            };
             
             return `
                 <tr data-transaction-id="${transaction.id}">
@@ -517,6 +570,10 @@ export class TransactionManager {
                     <td class="${transaction.type === 'income' ? 'text-success' : 'text-danger'}">
                         <strong>${formatCurrency(transaction.amount)}</strong>
                     </td>
+                    <td>${getPaymentStatusDisplay(paymentStatus)}</td>
+                    <td class="text-danger">
+                        ${outstandingAmount > 0 ? `<strong>${formatCurrency(outstandingAmount)}</strong>` : '-'}
+                    </td>
                     <td><span class="payment-method">${transaction.paymentMethod || 'N/A'}</span></td>
                     <td>
                         <div class="transaction-desc">
@@ -525,6 +582,11 @@ export class TransactionManager {
                     </td>
                     <td>
                         <div class="action-buttons">
+                            ${outstandingAmount > 0 ? `
+                                <button class="action-btn pay" onclick="transactionManager.markAsPaid('${transaction.id}')" title="Mark as Paid">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </button>
+                            ` : ''}
                             <button class="action-btn view" onclick="transactionManager.viewTransaction('${transaction.id}')" title="View">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -686,12 +748,23 @@ export class TransactionManager {
                 return t.type === 'income' ? sum + amount : sum - amount;
             }, 0);
         
+        // Calculate outstanding credit amounts
+        const outstandingTotal = allTransactions
+            .filter(t => t.paymentStatus === 'credit' || t.paymentStatus === 'partial')
+            .reduce((sum, t) => sum + parseFloat(t.outstandingAmount || 0), 0);
+        
         // Update summary display
         document.getElementById('total-income').textContent = formatCurrency(totalIncome);
         document.getElementById('total-expense').textContent = formatCurrency(totalExpense);
         document.getElementById('net-amount').textContent = formatCurrency(netAmount);
         document.getElementById('net-amount').className = `summary-value ${netAmount >= 0 ? 'income' : 'expense'}`;
         document.getElementById('filtered-total').textContent = formatCurrency(Math.abs(filteredTotal));
+        
+        // Update outstanding total if element exists
+        const outstandingElement = document.getElementById('outstanding-total');
+        if (outstandingElement) {
+            outstandingElement.textContent = formatCurrency(outstandingTotal);
+        }
     }
 
     showTransactionModal(transaction = null) {
@@ -733,22 +806,36 @@ export class TransactionManager {
             document.getElementById('transaction-amount').value = transaction.amount || '';
             document.getElementById('transaction-category').value = transaction.category || '';
             document.getElementById('transaction-payment-method').value = transaction.paymentMethod || '';
+            document.getElementById('transaction-payment-status').value = transaction.paymentStatus || 'paid';
+            document.getElementById('transaction-amount-paid').value = transaction.amountPaid || '';
+            document.getElementById('transaction-due-date').value = transaction.dueDate || '';
             document.getElementById('transaction-description').value = transaction.description || '';
             document.getElementById('transaction-notes').value = transaction.notes || '';
+            
+            // Trigger payment status change to show/hide appropriate fields
+            this.handlePaymentStatusChange(transaction.paymentStatus || 'paid');
         }
         
         window.showModal('transaction-modal');
     }
 
     saveTransaction() {
+        const paymentStatus = document.getElementById('transaction-payment-status').value;
+        const amount = parseFloat(document.getElementById('transaction-amount').value);
+        const amountPaid = paymentStatus === 'partial' ? parseFloat(document.getElementById('transaction-amount-paid').value) || 0 : (paymentStatus === 'paid' ? amount : 0);
+        
         const transactionData = {
             type: document.getElementById('transaction-type').value,
             date: document.getElementById('transaction-date').value,
             vendorId: document.getElementById('transaction-vendor').value || null,
             projectId: document.getElementById('transaction-project').value || null,
-            amount: parseFloat(document.getElementById('transaction-amount').value),
+            amount: amount,
             category: document.getElementById('transaction-category').value,
             paymentMethod: document.getElementById('transaction-payment-method').value,
+            paymentStatus: paymentStatus,
+            amountPaid: amountPaid,
+            outstandingAmount: amount - amountPaid,
+            dueDate: document.getElementById('transaction-due-date').value || null,
             description: document.getElementById('transaction-description').value.trim() || '-',
             notes: document.getElementById('transaction-notes').value.trim()
         };
@@ -762,6 +849,12 @@ export class TransactionManager {
         // Validate amount
         if (transactionData.amount <= 0) {
             showToast('Amount must be greater than zero', 'error');
+            return;
+        }
+        
+        // Validate partial payment amount
+        if (transactionData.paymentStatus === 'partial' && transactionData.amountPaid >= transactionData.amount) {
+            showToast('Amount paid cannot be greater than or equal to total amount', 'error');
             return;
         }
 
@@ -956,5 +1049,35 @@ export class TransactionManager {
         URL.revokeObjectURL(url);
 
         showToast('Transactions exported to CSV', 'success');
+    }
+
+    markAsPaid(transactionId) {
+        const transaction = this.storage.getTransactionById(transactionId);
+        if (!transaction) {
+            showToast('Transaction not found', 'error');
+            return;
+        }
+
+        if (confirm(`Mark transaction "${transaction.description}" as fully paid?`)) {
+            try {
+                const updatedData = {
+                    paymentStatus: 'paid',
+                    amountPaid: transaction.amount,
+                    outstandingAmount: 0
+                };
+                
+                this.storage.updateTransaction(transactionId, updatedData);
+                showToast('Transaction marked as paid', 'success');
+                this.renderTransactionsTable();
+                
+                // Refresh analytics if on dashboard
+                if (window.app && window.app.analytics) {
+                    window.app.analytics.loadDashboard();
+                }
+            } catch (error) {
+                console.error('Error marking transaction as paid:', error);
+                showToast('Failed to update transaction', 'error');
+            }
+        }
     }
 }
