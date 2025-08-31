@@ -97,7 +97,7 @@ export class ProjectManager {
                             <input type="number" id="project-budget" step="0.01" min="0">
                         </div>
                         
-                        <div class="form-group">
+                        <div class="form-group" style="display: none;">
                             <label for="project-progress">Progress (%)</label>
                             <input type="number" id="project-progress" min="0" max="100" value="0">
                         </div>
@@ -219,7 +219,7 @@ export class ProjectManager {
                         ` : ''}
                     </div>
                     
-                    <div class="project-progress">
+                    <div class="project-progress" style="display: none;">
                         <div class="project-progress-label">
                             <span>Progress</span>
                             <span>${project.progress || 0}%</span>
