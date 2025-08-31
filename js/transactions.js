@@ -166,7 +166,7 @@ export class TransactionManager {
                         <textarea id="transaction-description" rows="3" required></textarea>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label for="transaction-notes">Notes</label>
                         <textarea id="transaction-notes" rows="2"></textarea>
                     </div>
