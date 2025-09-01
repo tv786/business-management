@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a comprehensive Progressive Web Application (PWA) designed for business management across multiple industries including construction, retail, manufacturing, and service businesses. The application provides vendor management, transaction tracking, project management, analytics, and specialized calculators for construction businesses. The application now includes user authentication, allowing users to browse without an account but requiring login to use business features.
+This is a comprehensive Progressive Web Application (PWA) designed for business management across multiple industries including construction, retail, manufacturing, and service businesses. The application provides vendor management, transaction tracking, project management, and analytics. The application now includes user authentication, allowing users to browse without an account but requiring login to use business features.
 
 ## User Preferences
 
@@ -65,17 +65,13 @@ Preferred communication style: Simple, everyday language.
 - **Features**: Statistical overview, charts, recent activities
 - **Metrics**: Revenue, expenses, project status, vendor performance
 
-### 6. Construction Calculators (`js/calculators.js`)
-- **Purpose**: Industry-specific calculation tools
-- **Features**: Material calculations (concrete, brick, tiles, paint)
-- **Target Users**: Construction and manufacturing businesses
 
-### 7. Settings Management (`js/settings.js`)
+### 6. Settings Management (`js/settings.js`)
 - **Purpose**: Application customization
 - **Features**: Company branding, theme customization, business type selection
 - **Customization**: Colors, currency, language, date format
 
-### 8. Authentication Management (`js/auth.js`)
+### 7. Authentication Management (`js/auth.js`)
 - **Purpose**: User authentication and session management
 - **Features**: Login/signup modals, user session persistence, authentication checks
 - **Storage**: Client-side user storage using localStorage

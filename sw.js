@@ -16,7 +16,7 @@ const STATIC_FILES = [
     '/js/transactions.js',
     '/js/projects.js',
     '/js/analytics.js',
-    '/js/calculators.js',
+
     '/js/settings.js',
     '/js/utils.js',
     '/assets/logo.svg',

@@ -4,7 +4,7 @@ import { VendorManager } from './vendors.js';
 import { TransactionManager } from './transactions.js';
 import { ProjectManager } from './projects.js';
 import { AnalyticsManager } from './analytics.js';
-import { CalculatorManager } from './calculators.js';
+
 import { SettingsManager } from './settings.js';
 import { FirebaseAuthManager } from './firebase-auth.js';
 import { showToast, showLoading, hideLoading } from './utils.js';
@@ -21,7 +21,7 @@ class App {
         this.transactions = new TransactionManager(this.storage);
         this.projects = new ProjectManager(this.storage);
         this.analytics = new AnalyticsManager(this.storage);
-        this.calculators = new CalculatorManager();
+
         
         // Add Firebase integration methods
         addFirebaseIntegration(this);
@@ -112,9 +112,6 @@ class App {
                 this.projects.loadProjects();
                 break;
 
-            case 'calculators':
-                this.calculators.init();
-                break;
         }
     }
 
@@ -221,11 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.app = new App();
 });
 
-// Make calculators globally available
-window.calculateMaterial = () => window.app.calculators.calculateMaterial();
-window.calculateCost = () => window.app.calculators.calculateCost();
-window.calculateLabor = () => window.app.calculators.calculateLabor();
-window.calculateProfit = () => window.app.calculators.calculateProfit();
 
 // Global modal functions
 window.closeModal = () => {
