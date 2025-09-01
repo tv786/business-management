@@ -249,4 +249,54 @@ export class AnalyticsManager {
         if (category === '-') return '-';
         return category.charAt(0).toUpperCase() + category.slice(1).replace(/[-_]/g, ' ');
     }
+
+    renderRecentActivities() {
+        const transactions = this.storage.getTransactions();
+        const vendors = this.storage.getVendors();
+        const projects = this.storage.getProjects();
+        
+        // Get recent transactions (last 10)
+        const recentTransactions = transactions
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 10);
+        
+        const activitiesList = document.getElementById('recent-activities-list');
+        if (!activitiesList) return;
+        
+        activitiesList.innerHTML = '';
+        
+        if (recentTransactions.length === 0) {
+            activitiesList.innerHTML = '<p class="no-activities">No recent activities</p>';
+            return;
+        }
+        
+        recentTransactions.forEach(transaction => {
+            const vendor = vendors.find(v => v.id === transaction.vendorId);
+            const project = projects.find(p => p.id === transaction.projectId);
+            
+            const activityItem = document.createElement('div');
+            activityItem.className = 'activity-item';
+            
+            const typeIcon = transaction.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down';
+            const typeClass = transaction.type === 'income' ? 'income' : 'expense';
+            
+            activityItem.innerHTML = `
+                <div class="activity-icon ${typeClass}">
+                    <i class="fas ${typeIcon}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">${transaction.description || 'Transaction'}</div>
+                    <div class="activity-details">
+                        ${vendor ? vendor.name : ''} ${project ? '• ' + project.name : ''}
+                    </div>
+                    <div class="activity-date">${formatDate(transaction.date)}</div>
+                </div>
+                <div class="activity-amount ${typeClass}">
+                    ${formatCurrency(transaction.amount)}
+                </div>
+            `;
+            
+            activitiesList.appendChild(activityItem);
+        });
+    }
 }
