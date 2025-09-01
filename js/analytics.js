@@ -21,7 +21,7 @@ export class AnalyticsManager {
 
     loadDashboard() {
         this.updateStatCards();
-        this.renderCharts();
+        this.updateAnalytics();
         this.renderRecentActivities();
     }
 
@@ -76,498 +76,177 @@ export class AnalyticsManager {
         return transactions.filter(t => new Date(t.date) >= startDate);
     }
 
-    renderCharts() {
-        this.renderRevenueChart();
-        this.renderProjectStatusChart();
-        this.renderVendorSpendingChart();
-        this.renderMonthlyTransactionsChart();
+    updateAnalytics() {
+        this.updateFinancialAnalytics();
+        this.updateTransactionAnalytics();
+        this.updateVendorAnalytics();
+        this.updateProjectAnalytics();
+        this.updateTimeAnalytics();
+        this.updateCategoryAnalytics();
     }
 
-    renderRevenueChart() {
-        const ctx = document.getElementById('revenue-chart').getContext('2d');
-        
-        // Destroy existing chart if it exists
-        if (this.charts.revenue) {
-            this.charts.revenue.destroy();
-        }
-
-        const transactions = this.getTransactionsForPeriod();
-        const chartData = this.getRevenueChartData(transactions);
-
-        this.charts.revenue = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [
-                    {
-                        label: 'Income',
-                        data: chartData.income,
-                        borderColor: '#10B981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Expenses',
-                        data: chartData.expenses,
-                        borderColor: '#EF4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return formatCurrency(value);
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    renderProjectStatusChart() {
-        const ctx = document.getElementById('project-status-chart').getContext('2d');
-        
-        // Destroy existing chart if it exists
-        if (this.charts.projectStatus) {
-            this.charts.projectStatus.destroy();
-        }
-
-        const projects = this.storage.getProjects();
-        const statusCounts = {
-            planning: 0,
-            active: 0,
-            completed: 0,
-            'on-hold': 0
-        };
-
-        projects.forEach(project => {
-            statusCounts[project.status] = (statusCounts[project.status] || 0) + 1;
-        });
-
-        this.charts.projectStatus = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Planning', 'Active', 'Completed', 'On Hold'],
-                datasets: [{
-                    data: [
-                        statusCounts.planning,
-                        statusCounts.active,
-                        statusCounts.completed,
-                        statusCounts['on-hold']
-                    ],
-                    backgroundColor: [
-                        '#3B82F6',
-                        '#10B981',
-                        '#6B7280',
-                        '#F59E0B'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#FFFFFF'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-    }
-
-    renderVendorSpendingChart() {
-        const ctx = document.getElementById('vendor-spending-chart').getContext('2d');
-        
-        // Destroy existing chart if it exists
-        if (this.charts.vendorSpending) {
-            this.charts.vendorSpending.destroy();
-        }
-
-        const vendors = this.storage.getVendors();
-        const transactions = this.getTransactionsForPeriod();
-        
-        // Calculate spending per vendor
-        const vendorSpending = {};
-        transactions
-            .filter(t => t.type === 'expense' && t.vendorId)
-            .forEach(transaction => {
-                const vendor = vendors.find(v => v.id === transaction.vendorId);
-                if (vendor) {
-                    vendorSpending[vendor.name] = (vendorSpending[vendor.name] || 0) + transaction.amount;
-                }
-            });
-
-        // Get top 5 vendors by spending
-        const sortedVendors = Object.entries(vendorSpending)
-            .sort(([,a], [,b]) => b - a)
-            .slice(0, 5);
-
-        this.charts.vendorSpending = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: sortedVendors.map(([name]) => name),
-                datasets: [{
-                    label: 'Spending',
-                    data: sortedVendors.map(([, amount]) => amount),
-                    backgroundColor: '#F59E0B',
-                    borderColor: '#D97706',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return formatCurrency(value);
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'Spending: ' + formatCurrency(context.parsed.y);
-                            }
-                        }
-                    },
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-    }
-
-    renderMonthlyTransactionsChart() {
-        const ctx = document.getElementById('monthly-transactions-chart').getContext('2d');
-        
-        // Destroy existing chart if it exists
-        if (this.charts.monthlyTransactions) {
-            this.charts.monthlyTransactions.destroy();
-        }
-
-        const transactions = this.storage.getTransactions();
-        const monthlyData = this.getMonthlyTransactionData(transactions);
-
-        this.charts.monthlyTransactions = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: monthlyData.labels,
-                datasets: [
-                    {
-                        label: 'Income',
-                        data: monthlyData.income,
-                        backgroundColor: '#10B981',
-                        borderColor: '#059669',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Expenses',
-                        data: monthlyData.expenses,
-                        backgroundColor: '#EF4444',
-                        borderColor: '#DC2626',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return formatCurrency(value);
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    getRevenueChartData(transactions) {
-        const period = document.getElementById('dashboard-period').value;
-        const data = { labels: [], income: [], expenses: [] };
-        
-        if (period === 'week') {
-            // Last 7 days
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                
-                data.labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
-                
-                const dayTransactions = transactions.filter(t => t.date === dateStr);
-                const income = dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-                const expenses = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-                
-                data.income.push(income);
-                data.expenses.push(expenses);
-            }
-        } else if (period === 'month') {
-            // Last 30 days grouped by week
-            const now = new Date();
-            for (let i = 3; i >= 0; i--) {
-                const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (i * 7) - 6);
-                const weekEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (i * 7));
-                
-                data.labels.push(`Week ${4 - i}`);
-                
-                const weekTransactions = transactions.filter(t => {
-                    const transactionDate = new Date(t.date);
-                    return transactionDate >= weekStart && transactionDate <= weekEnd;
-                });
-                
-                const income = weekTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-                const expenses = weekTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-                
-                data.income.push(income);
-                data.expenses.push(expenses);
-            }
-        } else {
-            // Monthly data for quarter/year
-            const months = period === 'quarter' ? 3 : 12;
-            const now = new Date();
-            
-            for (let i = months - 1; i >= 0; i--) {
-                const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                data.labels.push(month.toLocaleDateString('en-US', { month: 'short' }));
-                
-                const monthTransactions = transactions.filter(t => {
-                    const transactionDate = new Date(t.date);
-                    return transactionDate.getMonth() === month.getMonth() && 
-                           transactionDate.getFullYear() === month.getFullYear();
-                });
-                
-                const income = monthTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-                const expenses = monthTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-                
-                data.income.push(income);
-                data.expenses.push(expenses);
-            }
-        }
-        
-        return data;
-    }
-
-    getMonthlyTransactionData(transactions) {
-        const data = { labels: [], income: [], expenses: [] };
-        const now = new Date();
-        
-        // Last 6 months
-        for (let i = 5; i >= 0; i--) {
-            const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            data.labels.push(month.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
-            
-            const monthTransactions = transactions.filter(t => {
-                const transactionDate = new Date(t.date);
-                return transactionDate.getMonth() === month.getMonth() && 
-                       transactionDate.getFullYear() === month.getFullYear();
-            });
-            
-            const income = monthTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const expenses = monthTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            
-            data.income.push(income);
-            data.expenses.push(expenses);
-        }
-        
-        return data;
-    }
-
-    renderRecentActivities() {
-        const activities = this.getRecentActivities();
-        const container = document.getElementById('recent-activities-list');
-        
-        if (activities.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <p>No recent activities</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = activities.map(activity => `
-            <div class="activity-item">
-                <div class="activity-icon">
-                    <i class="fas ${activity.icon}"></i>
-                </div>
-                <div class="activity-content">
-                    <p>${activity.description}</p>
-                    <div class="activity-time">${this.getTimeAgo(activity.timestamp)}</div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    getRecentActivities() {
-        const activities = [];
-        
-        // Get recent transactions
-        const transactions = this.storage.getTransactions()
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice(0, 5);
-            
-        transactions.forEach(transaction => {
-            const vendor = this.storage.getVendorById(transaction.vendorId);
-            const project = this.storage.getProjectById(transaction.projectId);
-            
-            activities.push({
-                icon: transaction.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down',
-                description: `${transaction.type === 'income' ? 'Received' : 'Paid'} ${formatCurrency(transaction.amount)} ${vendor ? `to ${vendor.name}` : ''} ${project ? `for ${project.name}` : ''}`,
-                timestamp: transaction.createdAt
-            });
-        });
-
-        // Get recent projects
-        const projects = this.storage.getProjects()
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice(0, 3);
-            
-        projects.forEach(project => {
-            activities.push({
-                icon: 'fa-hammer',
-                description: `New project "${project.name}" created`,
-                timestamp: project.createdAt
-            });
-        });
-
-        // Get recent vendors
-        const vendors = this.storage.getVendors()
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice(0, 2);
-            
-        vendors.forEach(vendor => {
-            activities.push({
-                icon: 'fa-building',
-                description: `New vendor "${vendor.name}" added`,
-                timestamp: vendor.createdAt
-            });
-        });
-
-        // Sort all activities by timestamp and limit to 10
-        return activities
-            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-            .slice(0, 10);
-    }
-
-    getTimeAgo(timestamp) {
-        const now = new Date();
-        const past = new Date(timestamp);
-        const diffInSeconds = Math.floor((now - past) / 1000);
-        
-        if (diffInSeconds < 60) {
-            return 'Just now';
-        } else if (diffInSeconds < 3600) {
-            const minutes = Math.floor(diffInSeconds / 60);
-            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-        } else if (diffInSeconds < 86400) {
-            const hours = Math.floor(diffInSeconds / 3600);
-            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-        } else {
-            const days = Math.floor(diffInSeconds / 86400);
-            if (days < 7) {
-                return `${days} day${days > 1 ? 's' : ''} ago`;
-            } else {
-                return formatDate(timestamp);
-            }
-        }
-    }
-
-    // Generate reports
-    generateProfitLossReport() {
+    updateFinancialAnalytics() {
         const transactions = this.getTransactionsForPeriod();
         const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
         const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-        const profit = income - expenses;
+        const netProfit = income - expenses;
+        const profitMargin = income > 0 ? ((netProfit / income) * 100).toFixed(1) : 0;
+        const avgTransaction = transactions.length > 0 ? (income + expenses) / transactions.length : 0;
         
-        return {
-            income,
-            expenses,
-            profit,
-            profitMargin: income > 0 ? (profit / income) * 100 : 0,
-            transactions: transactions.length
-        };
+        const period = document.getElementById('dashboard-period').value;
+        const daysInPeriod = this.getDaysInPeriod(period);
+        const dailyAvgIncome = daysInPeriod > 0 ? income / daysInPeriod : 0;
+        const dailyAvgExpenses = daysInPeriod > 0 ? expenses / daysInPeriod : 0;
+        
+        document.getElementById('net-profit').textContent = formatCurrency(netProfit);
+        document.getElementById('profit-margin').textContent = profitMargin + '%';
+        document.getElementById('avg-transaction').textContent = formatCurrency(avgTransaction);
+        document.getElementById('daily-avg-income').textContent = formatCurrency(dailyAvgIncome);
+        document.getElementById('daily-avg-expenses').textContent = formatCurrency(dailyAvgExpenses);
     }
 
-    generateProjectReport() {
-        const projects = this.storage.getProjects();
-        const transactions = this.storage.getTransactions();
+    updateTransactionAnalytics() {
+        const transactions = this.getTransactionsForPeriod();
+        const incomeTransactions = transactions.filter(t => t.type === 'income');
+        const expenseTransactions = transactions.filter(t => t.type === 'expense');
         
-        return projects.map(project => {
-            const projectTransactions = transactions.filter(t => t.projectId === project.id);
-            const income = projectTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const expenses = projectTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            
-            return {
-                ...project,
-                totalIncome: income,
-                totalExpenses: expenses,
-                profit: income - expenses,
-                transactionCount: projectTransactions.length,
-                profitMargin: income > 0 ? ((income - expenses) / income) * 100 : 0
-            };
-        });
+        const largestIncome = incomeTransactions.length > 0 ? Math.max(...incomeTransactions.map(t => t.amount)) : 0;
+        const largestExpense = expenseTransactions.length > 0 ? Math.max(...expenseTransactions.map(t => t.amount)) : 0;
+        
+        document.getElementById('total-transactions').textContent = transactions.length;
+        document.getElementById('income-transactions').textContent = incomeTransactions.length;
+        document.getElementById('expense-transactions').textContent = expenseTransactions.length;
+        document.getElementById('largest-income').textContent = formatCurrency(largestIncome);
+        document.getElementById('largest-expense').textContent = formatCurrency(largestExpense);
     }
 
-    generateVendorReport() {
+    updateVendorAnalytics() {
         const vendors = this.storage.getVendors();
-        const transactions = this.storage.getTransactions();
+        const transactions = this.getTransactionsForPeriod();
+        const activeVendors = vendors.filter(v => v.status === 'active').length;
+        const inactiveVendors = vendors.filter(v => v.status === 'inactive').length;
         
-        return vendors.map(vendor => {
-            const vendorTransactions = transactions.filter(t => t.vendorId === vendor.id);
-            const totalSpent = vendorTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            
-            return {
-                ...vendor,
-                totalSpent,
-                transactionCount: vendorTransactions.length,
-                lastTransaction: vendorTransactions.length > 0 ? 
-                    Math.max(...vendorTransactions.map(t => new Date(t.date).getTime())) : null
-            };
+        // Calculate vendor spending
+        const vendorSpending = {};
+        const vendorTransactionCount = {};
+        transactions.filter(t => t.type === 'expense' && t.vendorId).forEach(transaction => {
+            const vendor = vendors.find(v => v.id === transaction.vendorId);
+            if (vendor) {
+                vendorSpending[vendor.name] = (vendorSpending[vendor.name] || 0) + transaction.amount;
+                vendorTransactionCount[vendor.name] = (vendorTransactionCount[vendor.name] || 0) + 1;
+            }
         });
+        
+        const topVendorSpending = Object.keys(vendorSpending).length > 0 ? Math.max(...Object.values(vendorSpending)) : 0;
+        const avgVendorSpending = Object.keys(vendorSpending).length > 0 ? 
+            Object.values(vendorSpending).reduce((a, b) => a + b, 0) / Object.keys(vendorSpending).length : 0;
+        
+        const mostActiveVendor = Object.keys(vendorTransactionCount).length > 0 ?
+            Object.entries(vendorTransactionCount).reduce((a, b) => a[1] > b[1] ? a : b)[0] : '-';
+        
+        document.getElementById('active-vendors').textContent = activeVendors;
+        document.getElementById('inactive-vendors').textContent = inactiveVendors;
+        document.getElementById('top-vendor-spending').textContent = formatCurrency(topVendorSpending);
+        document.getElementById('avg-vendor-spending').textContent = formatCurrency(avgVendorSpending);
+        document.getElementById('most-active-vendor').textContent = mostActiveVendor;
+    }
+
+    updateProjectAnalytics() {
+        const projects = this.storage.getProjects();
+        const transactions = this.getTransactionsForPeriod();
+        
+        const planningProjects = projects.filter(p => p.status === 'planning').length;
+        const completedProjects = projects.filter(p => p.status === 'completed').length;
+        const onHoldProjects = projects.filter(p => p.status === 'on-hold').length;
+        
+        // Calculate project values from transactions
+        const projectValues = {};
+        transactions.forEach(transaction => {
+            if (transaction.projectId) {
+                projectValues[transaction.projectId] = (projectValues[transaction.projectId] || 0) + 
+                    (transaction.type === 'income' ? transaction.amount : -transaction.amount);
+            }
+        });
+        
+        const totalProjectValue = Object.values(projectValues).reduce((sum, val) => sum + Math.abs(val), 0);
+        const avgProjectCost = projects.length > 0 ? totalProjectValue / projects.length : 0;
+        
+        document.getElementById('planning-projects').textContent = planningProjects;
+        document.getElementById('completed-projects').textContent = completedProjects;
+        document.getElementById('onhold-projects').textContent = onHoldProjects;
+        document.getElementById('total-project-value').textContent = formatCurrency(totalProjectValue);
+        document.getElementById('avg-project-cost').textContent = formatCurrency(avgProjectCost);
+    }
+
+    updateTimeAnalytics() {
+        const period = document.getElementById('dashboard-period').value;
+        const transactions = this.getTransactionsForPeriod();
+        const daysInPeriod = this.getDaysInPeriod(period);
+        
+        // Get unique transaction dates
+        const transactionDates = [...new Set(transactions.map(t => t.date))];
+        const transactionDays = transactionDates.length;
+        const transactionsPerDay = transactionDays > 0 ? (transactions.length / transactionDays).toFixed(1) : 0;
+        
+        // Get last transaction date
+        const allTransactions = this.storage.getTransactions();
+        const lastTransaction = allTransactions.length > 0 ? 
+            allTransactions.reduce((latest, t) => new Date(t.date) > new Date(latest.date) ? t : latest) : null;
+        const lastTransactionDate = lastTransaction ? formatDate(lastTransaction.date) : '-';
+        
+        // Business activity level
+        const activityLevel = transactionDays / daysInPeriod;
+        let businessActivity = 'Low';
+        if (activityLevel > 0.7) businessActivity = 'High';
+        else if (activityLevel > 0.4) businessActivity = 'Medium';
+        
+        document.getElementById('days-in-period').textContent = daysInPeriod;
+        document.getElementById('transaction-days').textContent = transactionDays;
+        document.getElementById('transactions-per-day').textContent = transactionsPerDay;
+        document.getElementById('last-transaction-date').textContent = lastTransactionDate;
+        document.getElementById('business-activity').textContent = businessActivity;
+    }
+
+    updateCategoryAnalytics() {
+        const transactions = this.getTransactionsForPeriod();
+        const expenseTransactions = transactions.filter(t => t.type === 'expense');
+        
+        // Calculate category totals
+        const categoryTotals = {};
+        expenseTransactions.forEach(transaction => {
+            const category = transaction.category || 'other';
+            categoryTotals[category] = (categoryTotals[category] || 0) + transaction.amount;
+        });
+        
+        // Find top category
+        const topCategory = Object.keys(categoryTotals).length > 0 ?
+            Object.entries(categoryTotals).reduce((a, b) => a[1] > b[1] ? a : b) : ['-', 0];
+        
+        // Specific category costs
+        const materialsCost = categoryTotals['materials'] || 0;
+        const laborCost = categoryTotals['labor'] || 0;
+        const transportCost = categoryTotals['transport'] || 0;
+        
+        document.getElementById('top-expense-category').textContent = this.formatCategoryName(topCategory[0]);
+        document.getElementById('top-category-amount').textContent = formatCurrency(topCategory[1]);
+        document.getElementById('materials-cost').textContent = formatCurrency(materialsCost);
+        document.getElementById('labor-cost').textContent = formatCurrency(laborCost);
+        document.getElementById('transport-cost').textContent = formatCurrency(transportCost);
+    }
+
+    getDaysInPeriod(period) {
+        const now = new Date();
+        switch (period) {
+            case 'week': return 7;
+            case 'month': return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            case 'quarter': return 90;
+            case 'year': return 365;
+            default: return 30;
+        }
+    }
+
+    formatCategoryName(category) {
+        if (category === '-') return '-';
+        return category.charAt(0).toUpperCase() + category.slice(1).replace(/[-_]/g, ' ');
     }
 }
