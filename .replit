@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web"]
+modules = ["nodejs-20", "web", "python-3.11"]
 run = "node index.js"
 
 [nix]
@@ -14,10 +14,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Server"
+args = "Frontend"
 
 [[workflows.workflow]]
-name = "Server"
+name = "Frontend"
 author = "agent"
 
 [[workflows.workflow.tasks]]
