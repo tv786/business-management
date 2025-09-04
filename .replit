@@ -29,7 +29,8 @@ waitForPort = 5000
 outputType = "webview"
 
 [deployment]
-run = ["sh", "-c", "node index.js"]
+run = ["python3", "-m", "http.server"]
+deploymentTarget = "autoscale"
 
 [[ports]]
 localPort = 5000
