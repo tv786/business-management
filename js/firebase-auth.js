@@ -604,9 +604,8 @@ export class FirebaseAuthManager {
                 if (this.currentUser.photoURL) {
                     userAvatar.src = this.currentUser.photoURL;
                 } else {
-                    // Generate a simple avatar with user initials
-                    const initials = this.getInitials(this.currentUser.displayName || this.currentUser.email);
-                    userAvatar.src = this.generateAvatarDataURL(initials);
+                    // Hide avatar when no photo URL is available
+                    userAvatar.style.display = 'none';
                 }
             }
             

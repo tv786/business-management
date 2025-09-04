@@ -470,15 +470,10 @@ export class AuthManager {
     }
 
     generateAvatar(name) {
-        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
-        const color = colors[name.length % colors.length];
-        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-        
+        // Return transparent/empty avatar instead of initials
         return `data:image/svg+xml;base64,${btoa(`
             <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-                <rect width="40" height="40" fill="${color}" rx="20"/>
-                <text x="20" y="26" font-family="Arial, sans-serif" font-size="14" font-weight="bold" 
-                      text-anchor="middle" fill="white">${initials}</text>
+                <rect width="40" height="40" fill="transparent"/>
             </svg>
         `)}`;
     }
