@@ -86,8 +86,8 @@ export class TransactionManager {
                             <label for="transaction-type">Type *</label>
                             <select id="transaction-type" required>
                                 <option value="">Select Type</option>
-                                <option value="income">Income</option>
-                                <option value="expense">Expense</option>
+                                <option value="income">You Got</option>
+                                <option value="expense">You Give</option>
                             </select>
                         </div>
                         
