@@ -21,6 +21,16 @@ export class TransactionManager {
             this.showTransactionModal();
         });
 
+        // Quick add income button
+        document.getElementById('add-income-btn').addEventListener('click', () => {
+            this.showTransactionModal('income');
+        });
+
+        // Quick add expense button
+        document.getElementById('add-expense-btn').addEventListener('click', () => {
+            this.showTransactionModal('expense');
+        });
+
         // Search functionality
         document.getElementById('transaction-search').addEventListener('input', () => {
             this.filterTransactions();
@@ -767,12 +777,25 @@ export class TransactionManager {
         }
     }
 
-    showTransactionModal(transaction = null) {
+    showTransactionModal(transactionOrType = null) {
         // Check authentication
         if (!this.storage.requireAuth()) {
             showToast('Please login to manage transactions', 'warning');
             return;
         }
+        
+        // Handle different parameter types
+        let transaction = null;
+        let presetType = null;
+        
+        if (typeof transactionOrType === 'string') {
+            // Parameter is a transaction type for quick add
+            presetType = transactionOrType;
+        } else if (transactionOrType && typeof transactionOrType === 'object') {
+            // Parameter is a transaction object for editing
+            transaction = transactionOrType;
+        }
+        
         this.currentTransaction = transaction;
         const title = transaction ? 'Edit Transaction' : 'Add Transaction';
         
@@ -795,6 +818,11 @@ export class TransactionManager {
             const minutes = String(now.getMinutes()).padStart(2, '0');
             
             document.getElementById('transaction-date').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+        
+        // Set preset type if it's a quick add
+        if (presetType) {
+            document.getElementById('transaction-type').value = presetType;
         }
         
         // Populate form if editing

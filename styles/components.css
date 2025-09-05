@@ -1,3 +1,14 @@
+/* Quick Action Buttons */
+.quick-action-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.quick-action-buttons .btn {
+    margin: 0;
+}
+
 /* Dashboard Components */
 .dashboard-controls {
     display: flex;
