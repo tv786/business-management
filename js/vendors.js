@@ -129,7 +129,7 @@ export class VendorManager {
         if (vendors.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="8" class="empty-state">
+                    <td colspan="7" class="empty-state">
                         <div class="empty-state">
                             <i class="fas fa-building"></i>
                             <h3>No Vendors Found</h3>
@@ -159,10 +159,12 @@ export class VendorManager {
                     ${vendor.phone ? `<i class="fas fa-phone"></i> ${vendor.phone}<br>` : ''}
                     ${vendor.email ? `<i class="fas fa-envelope"></i> ${vendor.email}` : ''}
                 </td>
-                <td><strong class="expense-amount">${formatCurrency(this.calculateVendorAmounts(vendor).youGive)}</strong></td>
-                <td><strong class="income-amount">${formatCurrency(this.calculateVendorAmounts(vendor).youGot)}</strong></td>
-                <td><strong class="credit-amount ${this.calculateVendorAmounts(vendor).creditBalance >= 0 ? 'positive' : 'negative'}">${formatCurrency(this.calculateVendorAmounts(vendor).creditBalance)}</strong></td>
-                <td><span class="status-badge ${vendor.status}">${vendor.status}</span></td>
+                <td><strong class="you-give-amount">${formatCurrency(this.calculateVendorAmounts(vendor).youGive)}</strong></td>
+                <td><strong class="you-got-amount">${formatCurrency(this.calculateVendorAmounts(vendor).youGot)}</strong></td>
+                <td>
+                    ${this.formatCreditBalance(this.calculateVendorAmounts(vendor).creditBalance)}
+                </td>
+
                 <td>
                     <div class="action-buttons">
                         <button class="action-btn view" onclick="vendorManager.viewVendor('${vendor.id}')" title="View">
@@ -451,6 +453,28 @@ export class VendorManager {
                 console.error('Error deleting vendor:', error);
                 showToast('Failed to delete vendor', 'error');
             }
+        }
+    }
+
+    formatCreditBalance(creditBalance) {
+        const amount = Math.abs(creditBalance);
+        const formattedAmount = formatCurrency(amount);
+        
+        if (creditBalance > 0) {
+            return `<div class="credit-positive">
+                <strong>${formattedAmount}</strong>
+                <br><small class="credit-label">Vendor owes you</small>
+            </div>`;
+        } else if (creditBalance < 0) {
+            return `<div class="credit-negative">
+                <strong>${formattedAmount}</strong>
+                <br><small class="credit-label">You owe vendor</small>
+            </div>`;
+        } else {
+            return `<div class="credit-zero">
+                <strong>₹0.00</strong>
+                <br><small class="credit-label">All settled</small>
+            </div>`;
         }
     }
 
