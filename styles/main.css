@@ -510,3 +510,6 @@ body {
         font-size: 10px;
     }
 }
+#add-transaction-btn {
+    display: none;
+}
