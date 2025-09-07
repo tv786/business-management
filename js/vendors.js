@@ -658,3 +658,29 @@ export class VendorManager {
         showToast('Vendors exported to CSV', 'success');
     }
 }
+
+
+// Global function for contact picker in vendor form
+window.pickContactForVendor = async function() {
+    try {
+        const { pickContact } = await import("./utils.js");
+        const contact = await pickContact();
+        
+        if (contact) {
+            // Fill both name and phone fields
+            const nameField = document.getElementById("vendor-contact");
+            const phoneField = document.getElementById("vendor-phone");
+            
+            if (contact.name && nameField) {
+                nameField.value = contact.name;
+            }
+            if (contact.phone && phoneField) {
+                phoneField.value = contact.phone;
+            }
+        }
+    } catch (error) {
+        console.error("Error picking contact:", error);
+        const { showToast } = await import("./utils.js");
+        showToast("Contact picker not available", "warning");
+    }
+};
