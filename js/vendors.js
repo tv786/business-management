@@ -667,8 +667,8 @@ window.pickContactForVendor = async function() {
         const contact = await pickContact();
         
         if (contact) {
-            // Fill both name and phone fields
-            const nameField = document.getElementById("vendor-contact");
+            // Fill name and phone fields
+            const nameField = document.getElementById("vendor-name");
             const phoneField = document.getElementById("vendor-phone");
             
             if (contact.name && nameField) {
