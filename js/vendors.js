@@ -147,18 +147,10 @@ export class VendorManager {
                     <div class="vendor-info">
                         <strong>${vendor.name}</strong>
                         ${vendor.contact ? `<br><small class="text-muted">${vendor.contact}</small>` : ''}
+                        <p>${vendor.phone ? `${vendor.phone}` : ''}</p>
                     </div>
                 </td>
-                <td>
-                    ${vendor.category ? 
-                        `<span class="badge badge-category">${this.getCategoryLabel(vendor.category)}</span>` : 
-                        '<span class="badge badge-category uncategorized">Uncategorized</span>'
-                    }
-                </td>
-                <td>
-                    ${vendor.phone ? `<i class="fas fa-phone"></i> ${vendor.phone}<br>` : ''}
-                    ${vendor.email ? `<i class="fas fa-envelope"></i> ${vendor.email}` : ''}
-                </td>
+               
                 <td><strong class="you-give-amount">${formatCurrency(this.calculateVendorAmounts(vendor).youGive)}</strong></td>
                 <td><strong class="you-got-amount">${formatCurrency(this.calculateVendorAmounts(vendor).youGot)}</strong></td>
                 <td>
