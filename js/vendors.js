@@ -129,7 +129,7 @@ export class VendorManager {
         if (vendors.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="empty-state">
+                    <td colspan="8" class="empty-state">
                         <div class="empty-state">
                             <i class="fas fa-building"></i>
                             <h3>No Vendors Found</h3>
