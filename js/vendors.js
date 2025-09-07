@@ -159,7 +159,9 @@ export class VendorManager {
                     ${vendor.phone ? `<i class="fas fa-phone"></i> ${vendor.phone}<br>` : ''}
                     ${vendor.email ? `<i class="fas fa-envelope"></i> ${vendor.email}` : ''}
                 </td>
-                <td><strong>${formatCurrency(vendor.totalSpent || 0)}</strong></td>
+                <td><strong class="expense-amount">${formatCurrency(this.calculateVendorAmounts(vendor).youGive)}</strong></td>
+                <td><strong class="income-amount">${formatCurrency(this.calculateVendorAmounts(vendor).youGot)}</strong></td>
+                <td><strong class="credit-amount ${this.calculateVendorAmounts(vendor).creditBalance >= 0 ? 'positive' : 'negative'}">${formatCurrency(this.calculateVendorAmounts(vendor).creditBalance)}</strong></td>
                 <td><span class="status-badge ${vendor.status}">${vendor.status}</span></td>
                 <td>
                     <div class="action-buttons">
@@ -450,6 +452,44 @@ export class VendorManager {
                 showToast('Failed to delete vendor', 'error');
             }
         }
+    }
+
+    calculateVendorAmounts(vendor) {
+        const transactions = this.storage.getTransactionsByVendor(vendor.id);
+        
+        let youGive = 0; // Money paid to vendor (expenses)
+        let youGot = 0;  // Money received from vendor (income)
+        let outstandingCredit = 0;
+        
+        transactions.forEach(transaction => {
+            const amount = parseFloat(transaction.amount) || 0;
+            const outstandingAmount = parseFloat(transaction.outstandingAmount) || 0;
+            
+            if (transaction.type === 'expense') {
+                youGive += amount;
+                // If there's outstanding amount on an expense, it means we owe the vendor
+                if (outstandingAmount > 0) {
+                    outstandingCredit += outstandingAmount;
+                }
+            } else if (transaction.type === 'income') {
+                youGot += amount;
+                // If there's outstanding amount on income, it means vendor owes us
+                if (outstandingAmount > 0) {
+                    outstandingCredit -= outstandingAmount;
+                }
+            }
+        });
+        
+        // Credit balance: positive means vendor owes us, negative means we owe vendor
+        const creditBalance = outstandingCredit;
+        
+        return {
+            youGive,
+            youGot,
+            creditBalance,
+            netBalance: youGot - youGive,
+            transactionCount: transactions.length
+        };
     }
 
     getCategoryLabel(category) {
