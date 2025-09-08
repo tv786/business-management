@@ -31,6 +31,16 @@ export class TransactionManager {
             this.showTransactionModal('expense');
         });
 
+        // Quick add credit button
+        document.getElementById('add-credit-btn').addEventListener('click', () => {
+            this.showTransactionModal('credit');
+        });
+
+        // Quick add partial button
+        document.getElementById('add-partial-btn').addEventListener('click', () => {
+            this.showTransactionModal('partial');
+        });
+
         // Search functionality
         document.getElementById('transaction-search').addEventListener('input', () => {
             this.filterTransactions();
@@ -822,7 +832,16 @@ export class TransactionManager {
         
         // Set preset type if it's a quick add
         if (presetType) {
-            document.getElementById('transaction-type').value = presetType;
+            if (presetType === 'credit' || presetType === 'partial') {
+                // For credit and partial, set as expense by default
+                document.getElementById('transaction-type').value = 'expense';
+                // Set the payment status
+                document.getElementById('transaction-payment-status').value = presetType;
+                // Trigger the payment status change handler
+                this.handlePaymentStatusChange(presetType);
+            } else {
+                document.getElementById('transaction-type').value = presetType;
+            }
         }
         
         // Populate form if editing
