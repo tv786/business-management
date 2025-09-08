@@ -170,16 +170,33 @@ export class TransactionManager {
                     </div>
 
                     <div class="form-group">
-                        <label for="transaction-payment-method">Payment Method</label>
-                        <select id="transaction-payment-method">
-                            <option value="">Select Payment Method</option>
-                            <option value="cash">Cash</option>
-                            <option value="check">Check</option>
-                            <option value="upi">UPI</option>
-                            <option value="bank-transfer">Bank Transfer</option>
-                            <option value="card">Card</option>
-                            <option value="credit">Credit (Pay Later)</option>
-                        </select>
+                        <label>Payment Method</label>
+                        <div class="radio-group" id="transaction-payment-method">
+                            <label class="radio-option">
+                                <input type="radio" name="payment-method" value="cash">
+                                <span class="radio-label">Cash</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="payment-method" value="check">
+                                <span class="radio-label">Check</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="payment-method" value="upi">
+                                <span class="radio-label">UPI</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="payment-method" value="bank-transfer">
+                                <span class="radio-label">Bank Transfer</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="payment-method" value="card">
+                                <span class="radio-label">Card</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="payment-method" value="credit">
+                                <span class="radio-label">Credit (Pay Later)</span>
+                            </label>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -852,7 +869,11 @@ export class TransactionManager {
             document.getElementById('transaction-project').value = transaction.projectId || '';
             document.getElementById('transaction-amount').value = transaction.amount || '';
             document.getElementById('transaction-category').value = transaction.category || '';
-            document.getElementById('transaction-payment-method').value = transaction.paymentMethod || '';
+            // Set payment method radio button
+            const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
+            paymentMethodRadios.forEach(radio => {
+                radio.checked = radio.value === (transaction.paymentMethod || '');
+            });
             document.getElementById('transaction-payment-status').value = transaction.paymentStatus || 'paid';
             document.getElementById('transaction-amount-paid').value = transaction.amountPaid || '';
             document.getElementById('transaction-due-date').value = transaction.dueDate || '';
@@ -878,7 +899,7 @@ export class TransactionManager {
             projectId: document.getElementById('transaction-project').value || null,
             amount: amount,
             category: document.getElementById('transaction-category').value,
-            paymentMethod: document.getElementById('transaction-payment-method').value,
+            paymentMethod: document.querySelector('input[name="payment-method"]:checked')?.value || '',
             paymentStatus: paymentStatus,
             amountPaid: amountPaid,
             outstandingAmount: amount - amountPaid,

@@ -19,6 +19,11 @@ Preferred communication style: Simple, everyday language.
 - Enhanced transaction forms with quick add options for projects and vendors
 - Added contact picker integration for mobile devices
 
+### September 8, 2025 - UI Enhancements
+- Added Credit and Partial payment quick-add buttons for faster transaction entry
+- Changed Payment Method from dropdown to radio buttons for better user experience
+- Improved form usability with visual selection states for payment methods
+
 ## System Architecture
 
 ### Frontend Architecture
