@@ -949,7 +949,7 @@ select#dashboard-period {
 
 .modal-body {
     padding: var(--spacing-lg);
-    max-height: 60vh;
+    max-height: 85vh;
     overflow-y: auto;
 }
 
@@ -1002,6 +1002,7 @@ select#dashboard-period {
     gap: var(--spacing-sm);
     margin-top: var(--spacing-lg);
     padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
     border-top: var(--border-width) solid var(--gray-200);
 }
 
