@@ -571,16 +571,16 @@ export class TransactionManager {
             };
             
             return `
-                <tr data-transaction-id="${transaction.id}">
+                <tr data-transaction-id="${transaction.id}" class="${transaction.type === 'income' ? 'bg-success' : 'bg-danger'}">
                     <td>${formatDateWithTime(transaction.date)}</td>
-                    <td><span class="status-badge ${transaction.type}">${transaction.type}</span></td>
-                    <td><span class="category-badge">${transaction.category || 'N/A'}</span></td>
+                    
                     <td>${vendor ? vendor.name : 'N/A'}</td>
                     <td>${project ? project.name : 'N/A'}</td>
                     <td class="${transaction.type === 'income' ? 'text-success' : 'text-danger'}">
-                        <strong>${formatCurrency(transaction.amount)}</strong>
+                        <strong>${formatCurrency(transaction.amount)}</strong> <br/>
+                        <p class="payment-status">${getPaymentStatusDisplay(paymentStatus)}</p>
                     </td>
-                    <td>${getPaymentStatusDisplay(paymentStatus)}</td>
+                    
                     <td class="text-danger">
                         ${outstandingAmount > 0 ? `<strong>${formatCurrency(outstandingAmount)}</strong>` : '-'}
                     </td>

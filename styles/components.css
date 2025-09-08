@@ -791,7 +791,7 @@ select#dashboard-period {
     gap: 4px;
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -821,6 +821,13 @@ select#dashboard-period {
     background: #218838;
 }
 
+/* BG COLOR FOR TRANSACTION ROWS */
+.bg-success {
+    background-color: #f6fff8 !important;
+}
+.bg-danger {
+    background-color: #fff4f4 !important;
+}
 /* Summary Card Credit Style */
 .summary-value.credit {
     color: #dc3545;
