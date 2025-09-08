@@ -187,15 +187,7 @@ export class TransactionManager {
                             <label class="radio-option">
                                 <input type="radio" name="payment-method" value="bank-transfer">
                                 <span class="radio-label">Bank Transfer</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="payment-method" value="card">
-                                <span class="radio-label">Card</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="payment-method" value="credit">
-                                <span class="radio-label">Credit (Pay Later)</span>
-                            </label>
+                            </label>                         
                         </div>
                     </div>
                     

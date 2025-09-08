@@ -1045,6 +1045,16 @@ select#dashboard-period {
     transition: var(--transition);
 }
 
+/* Credit and partial payment button styles */
+#add-credit-btn {
+    background-color: rgb(218, 141, 0);
+    color: white;
+}
+#add-partial-btn {
+    background-color: rgb(255, 127, 7);
+    color: white;
+}
+
 .modal-actions {
     display: flex;
     justify-content: flex-end;
