@@ -591,7 +591,9 @@ export class TransactionManager {
             
             return `
                 <tr data-transaction-id="${transaction.id}" class="${transaction.type === 'income' ? 'bg-success' : 'bg-danger'}">
-                    <td>${formatDateWithTime(transaction.date)}</td>
+                    <td>${formatDateWithTime(transaction.date)}
+                    <span class="payment-method">${transaction.paymentMethod || 'N/A'}</span>
+                    </td>
                     
                     <td>${vendor ? vendor.name : 'N/A'}</td>
                     <td>${project ? project.name : 'N/A'}</td>
@@ -603,7 +605,7 @@ export class TransactionManager {
                     <td class="text-danger">
                         ${outstandingAmount > 0 ? `<strong>${formatCurrency(outstandingAmount)}</strong>` : '-'}
                     </td>
-                    <td><span class="payment-method">${transaction.paymentMethod || 'N/A'}</span></td>
+                    
                     <td>
                         <div class="transaction-desc">
                             ${transaction.description}
