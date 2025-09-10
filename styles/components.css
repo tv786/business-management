@@ -621,6 +621,22 @@ select#dashboard-period {
     border-bottom: none;
 }
 
+/* Clickable transaction rows */
+.transaction-row {
+    cursor: pointer !important;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.transaction-row:hover {
+    background-color: var(--gray-100) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-row:active {
+    transform: translateY(0);
+}
+
 /* Project Cards */
 .projects-grid {
     display: grid;

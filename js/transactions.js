@@ -590,7 +590,7 @@ export class TransactionManager {
             };
             
             return `                
-                <tr data-transaction-id="${transaction.id}" class="${transaction.type === 'income' ? 'bg-success' : 'bg-danger'}" >
+                <tr data-transaction-id="${transaction.id}" class="transaction-row ${transaction.type === 'income' ? 'bg-success' : 'bg-danger'}" >
                     <td>${formatDateWithTime(transaction.date)}
                     <span class="payment-method">${transaction.paymentMethod || 'N/A'}</span>
                     </td>
@@ -614,17 +614,17 @@ export class TransactionManager {
                     <td>
                         <div class="action-buttons">
                             ${outstandingAmount > 0 ? `
-                                <button class="action-btn pay" onclick="transactionManager.markAsPaid('${transaction.id}')" title="Mark as Paid">
+                                <button class="action-btn pay" onclick="event.stopPropagation(); transactionManager.markAsPaid('${transaction.id}')" title="Mark as Paid">
                                     <i class="fas fa-dollar-sign"></i>
                                 </button>
                             ` : ''}
-                            <button class="action-btn view" onclick="transactionManager.viewTransaction('${transaction.id}')" title="View">
+                            <button class="action-btn view" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="action-btn edit" onclick="transactionManager.editTransaction('${transaction.id}')" title="Edit">
+                            <button class="action-btn edit" onclick="event.stopPropagation(); transactionManager.editTransaction('${transaction.id}')" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="action-btn delete" onclick="transactionManager.deleteTransaction('${transaction.id}')" title="Delete">
+                            <button class="action-btn delete" onclick="event.stopPropagation(); transactionManager.deleteTransaction('${transaction.id}')" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -636,8 +636,32 @@ export class TransactionManager {
         // Update transaction summary
         this.updateTransactionSummary(transactions);
 
+        // Add row click event listeners
+        this.setupRowClickHandlers();
+
         // Make transactionManager globally available
         window.transactionManager = this;
+    }
+
+    setupRowClickHandlers() {
+        // Add click event listeners to transaction rows
+        const transactionRows = document.querySelectorAll('.transaction-row');
+        transactionRows.forEach(row => {
+            row.addEventListener('click', (e) => {
+                // Don't trigger if clicking on action buttons
+                if (e.target.closest('.action-buttons')) {
+                    return;
+                }
+                
+                const transactionId = row.dataset.transactionId;
+                if (transactionId) {
+                    this.viewTransaction(transactionId);
+                }
+            });
+            
+            // Add cursor pointer style to indicate clickable
+            row.style.cursor = 'pointer';
+        });
     }
 
     getFilteredTransactions() {
