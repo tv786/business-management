@@ -24,6 +24,14 @@ Preferred communication style: Simple, everyday language.
 - Changed Payment Method from dropdown to radio buttons for better user experience
 - Improved form usability with visual selection states for payment methods
 
+### September 10, 2025 - Payment History Feature
+- Added comprehensive payment history tracking for both vendors and projects
+- Created payment history modals showing detailed transaction chronology with running totals
+- Implemented payment summary with outstanding amounts, budget tracking, and net calculations
+- Added print functionality for payment history reports
+- Enhanced vendor and project cards with dedicated "Payments" buttons for quick access to payment history
+- Designed responsive payment history tables with color-coded transaction types and status indicators
+
 ## System Architecture
 
 ### Frontend Architecture
