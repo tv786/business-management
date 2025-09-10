@@ -259,6 +259,9 @@ export class ProjectManager {
                     ` : ''}
                     
                     <div class="project-actions">
+                        <button class="btn btn-sm btn-primary" onclick="projectManager.viewPaymentHistory('${project.id}')">
+                            <i class="fas fa-history"></i> Payments
+                        </button>
                         <button class="btn btn-sm btn-secondary" onclick="projectManager.viewProject('${project.id}')">
                             <i class="fas fa-eye"></i> View
                         </button>
@@ -629,5 +632,237 @@ export class ProjectManager {
             console.error('Error updating project progress:', error);
             showToast('Failed to update progress', 'error');
         }
+    }
+
+    // View payment history for a project
+    viewPaymentHistory(projectId) {
+        const project = this.storage.getProjectById(projectId);
+        if (!project) {
+            showToast('Project not found', 'error');
+            return;
+        }
+
+        // Get all transactions for this project
+        const allTransactions = this.storage.getTransactions();
+        const projectTransactions = allTransactions.filter(transaction => transaction.projectId === projectId);
+        
+        if (projectTransactions.length === 0) {
+            showToast(`No payment history found for ${project.name}`, 'info');
+            return;
+        }
+
+        // Sort transactions by date (newest first)
+        projectTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Calculate totals
+        let totalSpent = 0;
+        let totalReceived = 0;
+        let outstandingAmount = 0;
+        let netAmount = 0;
+
+        projectTransactions.forEach(transaction => {
+            const amount = parseFloat(transaction.amount || 0);
+            if (transaction.type === 'expense') {
+                totalSpent += amount;
+                if (transaction.paymentStatus === 'credit' || transaction.paymentStatus === 'partial') {
+                    outstandingAmount += parseFloat(transaction.outstandingAmount || 0);
+                }
+            } else if (transaction.type === 'income') {
+                totalReceived += amount;
+            }
+        });
+
+        netAmount = totalReceived - totalSpent;
+
+        // Get vendors for display
+        const vendors = this.storage.getVendors();
+
+        // Calculate progress if budget exists
+        const progressInfo = project.budget ? 
+            `<div class="summary-item budget">
+                <div class="summary-label">Budget:</div>
+                <div class="summary-amount">${formatCurrency(project.budget)}</div>
+            </div>
+            <div class="summary-item remaining">
+                <div class="summary-label">Remaining Budget:</div>
+                <div class="summary-amount ${(project.budget - totalSpent) >= 0 ? 'text-success' : 'text-danger'}">
+                    ${formatCurrency(project.budget - totalSpent)}
+                </div>
+            </div>` : '';
+
+        const modalContent = `
+            <div class="payment-history">
+                <div class="payment-summary">
+                    <h3>Payment History for ${project.name}</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item expense">
+                            <div class="summary-label">Total Spent:</div>
+                            <div class="summary-amount">${formatCurrency(totalSpent)}</div>
+                        </div>
+                        <div class="summary-item income">
+                            <div class="summary-label">Total Received:</div>
+                            <div class="summary-amount">${formatCurrency(totalReceived)}</div>
+                        </div>
+                        <div class="summary-item outstanding">
+                            <div class="summary-label">Outstanding Amount:</div>
+                            <div class="summary-amount">${formatCurrency(outstandingAmount)}</div>
+                        </div>
+                        ${progressInfo}
+                        <div class="summary-item net">
+                            <div class="summary-label">Net Amount:</div>
+                            <div class="summary-amount ${netAmount >= 0 ? 'text-success' : 'text-danger'}">
+                                ${formatCurrency(netAmount)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-history-table">
+                    <h4>Transaction History (${projectTransactions.length} transactions)</h4>
+                    <div class="table-responsive">
+                        <table class="payment-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Vendor</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Outstanding</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${projectTransactions.map(transaction => {
+                                    const vendor = vendors.find(v => v.id === transaction.vendorId);
+                                    const paymentStatus = transaction.paymentStatus || 'paid';
+                                    const outstandingAmt = transaction.outstandingAmount || 0;
+                                    
+                                    return `
+                                        <tr class="${transaction.type}">
+                                            <td>${formatDate(transaction.date)}</td>
+                                            <td>${vendor ? vendor.name : 'N/A'}</td>
+                                            <td>
+                                                <span class="transaction-type ${transaction.type}">
+                                                    ${transaction.type === 'expense' ? 'You Give' : 'You Got'}
+                                                </span>
+                                            </td>
+                                            <td class="${transaction.type === 'income' ? 'text-success' : 'text-danger'}">
+                                                <strong>${formatCurrency(transaction.amount)}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="payment-status ${paymentStatus}">
+                                                    ${paymentStatus === 'paid' ? 'Paid' : 
+                                                      paymentStatus === 'credit' ? 'Credit' : 'Partial'}
+                                                </span>
+                                            </td>
+                                            <td class="text-danger">
+                                                ${outstandingAmt > 0 ? formatCurrency(outstandingAmt) : '-'}
+                                            </td>
+                                            <td>${transaction.description || ''}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="payment-actions">
+                    <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                    <button class="btn btn-primary" onclick="projectManager.printProjectPaymentHistory('${projectId}')">
+                        <i class="fas fa-print"></i> Print History
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Use the showInfoModal from transactions manager (shared modal)
+        if (window.transactionManager && window.transactionManager.showInfoModal) {
+            window.transactionManager.showInfoModal(`Payment History - ${project.name}`, modalContent);
+        } else {
+            // Fallback if transaction manager not available
+            showToast('Please go to Transactions section first to initialize payment history', 'warning');
+        }
+    }
+
+    // Print project payment history
+    printProjectPaymentHistory(projectId) {
+        const project = this.storage.getProjectById(projectId);
+        if (!project) return;
+
+        const allTransactions = this.storage.getTransactions();
+        const projectTransactions = allTransactions.filter(transaction => transaction.projectId === projectId);
+        const vendors = this.storage.getVendors();
+        
+        // Create print window
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Project Payment History - ${project.name}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+                        .summary { background: #f5f5f5; padding: 15px; margin: 20px 0; border-radius: 5px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .expense { color: #dc3545; }
+                        .income { color: #28a745; }
+                        .print-date { text-align: right; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-date">Printed on: ${new Date().toLocaleDateString()}</div>
+                    <h1>Project Payment History - ${project.name}</h1>
+                    <div class="summary">
+                        <h3>Summary:</h3>
+                        <p><strong>Total Spent:</strong> ${formatCurrency(projectTransactions
+                            .filter(t => t.type === 'expense')
+                            .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0))}</p>
+                        <p><strong>Total Received:</strong> ${formatCurrency(projectTransactions
+                            .filter(t => t.type === 'income')
+                            .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0))}</p>
+                        <p><strong>Outstanding:</strong> ${formatCurrency(projectTransactions
+                            .reduce((sum, t) => sum + parseFloat(t.outstandingAmount || 0), 0))}</p>
+                        ${project.budget ? `<p><strong>Budget:</strong> ${formatCurrency(project.budget)}</p>` : ''}
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Vendor</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Outstanding</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${projectTransactions.map(transaction => {
+                                const vendor = vendors.find(v => v.id === transaction.vendorId);
+                                return `
+                                    <tr>
+                                        <td>${formatDate(transaction.date)}</td>
+                                        <td>${vendor ? vendor.name : 'N/A'}</td>
+                                        <td class="${transaction.type}">
+                                            ${transaction.type === 'expense' ? 'You Give' : 'You Got'}
+                                        </td>
+                                        <td class="${transaction.type}">${formatCurrency(transaction.amount)}</td>
+                                        <td>${transaction.paymentStatus || 'paid'}</td>
+                                        <td>${transaction.outstandingAmount ? formatCurrency(transaction.outstandingAmount) : '-'}</td>
+                                        <td>${transaction.description || ''}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
     }
 }

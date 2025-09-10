@@ -652,6 +652,37 @@ export class VendorManager {
 
         showToast('Vendors exported to CSV', 'success');
     }
+    viewPaymentHistory(vendorId) {
+        const vendor = this.storage.getVendorById(vendorId);
+        if (!vendor) {
+            showToast("Vendor not found", "error");
+            return;
+        }
+        const allTransactions = this.storage.getTransactions();
+        const vendorTransactions = allTransactions.filter(transaction => transaction.vendorId === vendorId);
+        if (vendorTransactions.length === 0) {
+            showToast(`No payment history found for ${vendor.name}`, "info");
+            return;
+        }
+        vendorTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        let totalPaid = 0;
+        let totalReceived = 0;
+        let outstandingAmount = 0;
+        vendorTransactions.forEach(transaction => {
+            const amount = parseFloat(transaction.amount || 0);
+            if (transaction.type === "expense") {
+                totalPaid += amount;
+                if (transaction.paymentStatus === "credit" || transaction.paymentStatus === "partial") {
+                    outstandingAmount += parseFloat(transaction.outstandingAmount || 0);
+                }
+            } else if (transaction.type === "income") {
+                totalReceived += amount;
+            }
+        });
+        const projects = this.storage.getProjects();
+        const modalContent = `<div class="payment-history"><div class="payment-summary"><h3>Payment Summary for ${vendor.name}</h3><div class="summary-grid"><div class="summary-item expense"><div class="summary-label">Total You Give:</div><div class="summary-amount">${formatCurrency(totalPaid)}</div></div><div class="summary-item income"><div class="summary-label">Total You Got:</div><div class="summary-amount">${formatCurrency(totalReceived)}</div></div><div class="summary-item outstanding"><div class="summary-label">Outstanding Amount:</div><div class="summary-amount">${formatCurrency(outstandingAmount)}</div></div></div></div><div class="payment-history-table"><h4>Transaction History (${vendorTransactions.length} transactions)</h4><div class="table-responsive"><table class="payment-table"><thead><tr><th>Date</th><th>Project</th><th>Type</th><th>Amount</th><th>Status</th><th>Outstanding</th><th>Description</th></tr></thead><tbody>${vendorTransactions.map(transaction => {const project = projects.find(p => p.id === transaction.projectId);const paymentStatus = transaction.paymentStatus || "paid";const outstandingAmt = transaction.outstandingAmount || 0;return `<tr class="${transaction.type}"><td>${formatDate(transaction.date)}</td><td>${project ? project.name : "N/A"}</td><td><span class="transaction-type ${transaction.type}">${transaction.type === "expense" ? "You Give" : "You Got"}</span></td><td class="${transaction.type === "income" ? "text-success" : "text-danger"}"><strong>${formatCurrency(transaction.amount)}</strong></td><td><span class="payment-status ${paymentStatus}">${paymentStatus === "paid" ? "Paid" : paymentStatus === "credit" ? "Credit" : "Partial"}</span></td><td class="text-danger">${outstandingAmt > 0 ? formatCurrency(outstandingAmt) : "-"}</td><td>${transaction.description || ""}</td></tr>`;}).join("")}</tbody></table></div></div><div class="payment-actions"><button class="btn btn-secondary" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="vendorManager.printPaymentHistory('${vendorId}')"><i class="fas fa-print"></i> Print History</button></div></div>`;
+        this.showInfoModal(`Payment History - ${vendor.name}`, modalContent);
+    }
 }
 
 
@@ -680,126 +711,3 @@ window.pickContactForVendor = async function() {
     }
 };
 
-    // View payment history for a vendor
-    viewPaymentHistory(vendorId) {
-        const vendor = this.storage.getVendorById(vendorId);
-        if (!vendor) {
-            showToast("Vendor not found", "error");
-            return;
-        }
-
-        // Get all transactions for this vendor
-        const allTransactions = this.storage.getTransactions();
-        const vendorTransactions = allTransactions.filter(transaction => transaction.vendorId === vendorId);
-        
-        if (vendorTransactions.length === 0) {
-            showToast(`No payment history found for ${vendor.name}`, "info");
-            return;
-        }
-
-        // Sort transactions by date (newest first)
-        vendorTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        // Calculate totals
-        let totalPaid = 0;
-        let totalReceived = 0;
-        let outstandingAmount = 0;
-
-        vendorTransactions.forEach(transaction => {
-            const amount = parseFloat(transaction.amount || 0);
-            if (transaction.type === "expense") {
-                totalPaid += amount;
-                if (transaction.paymentStatus === "credit" || transaction.paymentStatus === "partial") {
-                    outstandingAmount += parseFloat(transaction.outstandingAmount || 0);
-                }
-            } else if (transaction.type === "income") {
-                totalReceived += amount;
-            }
-        });
-
-        // Get projects for display
-        const projects = this.storage.getProjects();
-
-        const modalContent = `
-            <div class="payment-history">
-                <div class="payment-summary">
-                    <h3>Payment Summary for ${vendor.name}</h3>
-                    <div class="summary-grid">
-                        <div class="summary-item expense">
-                            <div class="summary-label">Total You Give:</div>
-                            <div class="summary-amount">${formatCurrency(totalPaid)}</div>
-                        </div>
-                        <div class="summary-item income">
-                            <div class="summary-label">Total You Got:</div>
-                            <div class="summary-amount">${formatCurrency(totalReceived)}</div>
-                        </div>
-                        <div class="summary-item outstanding">
-                            <div class="summary-label">Outstanding Amount:</div>
-                            <div class="summary-amount">${formatCurrency(outstandingAmount)}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="payment-history-table">
-                    <h4>Transaction History (${vendorTransactions.length} transactions)</h4>
-                    <div class="table-responsive">
-                        <table class="payment-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Project</th>
-                                    <th>Type</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Outstanding</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${vendorTransactions.map(transaction => {
-                                    const project = projects.find(p => p.id === transaction.projectId);
-                                    const paymentStatus = transaction.paymentStatus || "paid";
-                                    const outstandingAmt = transaction.outstandingAmount || 0;
-                                    
-                                    return `
-                                        <tr class="${transaction.type}">
-                                            <td>${formatDate(transaction.date)}</td>
-                                            <td>${project ? project.name : "N/A"}</td>
-                                            <td>
-                                                <span class="transaction-type ${transaction.type}">
-                                                    ${transaction.type === "expense" ? "You Give" : "You Got"}
-                                                </span>
-                                            </td>
-                                            <td class="${transaction.type === "income" ? "text-success" : "text-danger"}">
-                                                <strong>${formatCurrency(transaction.amount)}</strong>
-                                            </td>
-                                            <td>
-                                                <span class="payment-status ${paymentStatus}">
-                                                    ${paymentStatus === "paid" ? "Paid" : 
-                                                      paymentStatus === "credit" ? "Credit" : "Partial"}
-                                                </span>
-                                            </td>
-                                            <td class="text-danger">
-                                                ${outstandingAmt > 0 ? formatCurrency(outstandingAmt) : "-"}
-                                            </td>
-                                            <td>${transaction.description || ""}</td>
-                                        </tr>
-                                    `;
-                                }).join("")}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="payment-actions">
-                    <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-                    <button class="btn btn-primary" onclick="vendorManager.printPaymentHistory()">
-                        <i class="fas fa-print"></i> Print History
-                    </button>
-                </div>
-            </div>
-        `;
-
-        this.showInfoModal(`Payment History - ${vendor.name}`, modalContent);
-    }
-}

@@ -637,6 +637,179 @@ select#dashboard-period {
     transform: translateY(0);
 }
 
+/* Payment History Modal Styles */
+.payment-history {
+    max-width: 800px;
+    width: 100%;
+}
+
+.payment-summary {
+    background: var(--gray-50);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.summary-item {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    border-left: 4px solid var(--gray-300);
+}
+
+.summary-item.expense {
+    border-left-color: var(--danger-color);
+}
+
+.summary-item.income {
+    border-left-color: var(--success-color);
+}
+
+.summary-item.outstanding {
+    border-left-color: var(--warning-color);
+}
+
+.summary-label {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-xs);
+}
+
+.summary-amount {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.payment-history-table {
+    margin-bottom: var(--spacing-lg);
+}
+
+.payment-history-table h4 {
+    color: var(--gray-700);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--gray-200);
+    padding-bottom: var(--spacing-sm);
+}
+
+.payment-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+    background: var(--white);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.payment-table th {
+    background: var(--gray-50);
+    color: var(--gray-700);
+    font-weight: 600;
+    text-align: left;
+    padding: var(--spacing-md);
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.payment-table td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+}
+
+.payment-table tbody tr:hover {
+    background-color: var(--gray-50);
+}
+
+.payment-table .transaction-type {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.payment-table .transaction-type.expense {
+    background: var(--danger-light);
+    color: var(--danger-color);
+}
+
+.payment-table .transaction-type.income {
+    background: var(--success-light);
+    color: var(--success-color);
+}
+
+.payment-table .payment-status {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.payment-table .payment-status.paid {
+    background: var(--success-light);
+    color: var(--success-color);
+}
+
+.payment-table .payment-status.credit {
+    background: var(--warning-light);
+    color: var(--warning-color);
+}
+
+.payment-table .payment-status.partial {
+    background: var(--info-light);
+    color: var(--info-color);
+}
+
+.payment-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--gray-200);
+}
+
+/* Payment history button styling */
+.action-btn.payment-history {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.action-btn.payment-history:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Responsive design for payment history */
+@media (max-width: 768px) {
+    .payment-history {
+        max-width: 95vw;
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .payment-table {
+        font-size: var(--font-size-xs);
+    }
+    
+    .payment-table th,
+    .payment-table td {
+        padding: var(--spacing-sm);
+    }
+    
+    .payment-actions {
+        flex-direction: column;
+    }
+}
+
 /* Project Cards */
 .projects-grid {
     display: grid;
