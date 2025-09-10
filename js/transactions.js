@@ -589,8 +589,8 @@ export class TransactionManager {
                 }
             };
             
-            return `
-                <tr data-transaction-id="${transaction.id}" class="${transaction.type === 'income' ? 'bg-success' : 'bg-danger'}">
+            return `                
+                <tr data-transaction-id="${transaction.id}" class="${transaction.type === 'income' ? 'bg-success' : 'bg-danger'}" >
                     <td>${formatDateWithTime(transaction.date)}
                     <span class="payment-method">${transaction.paymentMethod || 'N/A'}</span>
                     </td>

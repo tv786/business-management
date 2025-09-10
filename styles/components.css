@@ -1054,6 +1054,11 @@ select#dashboard-period {
     background-color: rgb(255, 127, 7);
     color: white;
 }
+.quick-add-transaction-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
 
 .modal-actions {
     display: flex;
