@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web"]
+modules = ["nodejs-20", "web", "python-3.11"]
 run = "node index.js"
 
 [nix]
@@ -25,7 +25,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -m http.server 5000 --bind 0.0.0.0"
+args = "python3 -m http.server 5000 --bind 0.0.0.0"
 waitForPort = 5000
 
 [deployment]
@@ -35,10 +35,6 @@ deploymentTarget = "autoscale"
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 40425
-externalPort = 3000
 
 [agent]
 expertMode = true
